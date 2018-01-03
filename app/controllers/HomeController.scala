@@ -2,7 +2,7 @@ package controllers
 
 import javax.inject.Inject
 
-import models.Rack
+import models.{Gpu, Rack}
 import play.api.libs.functional.syntax._
 import play.api.libs.json._
 import play.api.mvc._
@@ -12,6 +12,8 @@ import scala.collection.mutable
 class HomeController @Inject()(cc: ControllerComponents) extends AbstractController(cc) {
 
   val rackRepository: mutable.MutableList[Rack] = new mutable.MutableList[Rack]()
+
+  val gpuRepository: mutable.MutableList[Gpu] = new mutable.MutableList[Gpu]()
 
   def index() = Action { implicit request: Request[AnyContent] =>
     Ok(views.html.index())
@@ -50,5 +52,29 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
     println(at)
     val list = rackRepository.filter { r: Rack => r.currentHour == at }
     Ok(Json.toJson(list)).as(JSON)
+  }
+
+  def addGpu() = Action(parse.json) { request =>
+    println("addGpu: ")
+    val either = request.body.validate[Rack]
+    either.fold(
+      errors => BadRequest("invalid json Rack"),
+      rack => {
+        val listRack = rackRepository.filter { r: Rack => r.id == rack.id }
+        if (listRack.size == 0) {
+          NotFound
+        } else {
+          val listGpu = gpuRepository.filter { g: Gpu => g.rackId == rack.id }
+          var size = listGpu.size
+          listRack.foreach { r =>
+            val gpu = Gpu(r.id + "-gpu-" + size, r.id, 0, System.currentTimeMillis)
+            gpuRepository.+=(gpu)
+            println("added: " + gpu)
+            size += 1
+          }
+          Ok
+        }
+      }
+    )
   }
 }
