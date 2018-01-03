@@ -3,7 +3,6 @@
 CREATE TABLE "rack"
 (
   id           VARCHAR(255) NOT NULL UNIQUE,
-  gpuId        VARCHAR(255) NOT NULL,
   produced     FLOAT NOT NULL,
   currentHour  TIMESTAMP NOT NULL
 );
