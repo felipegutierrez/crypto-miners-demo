@@ -5,7 +5,7 @@ import scala.concurrent.{ ExecutionContext, Future }
 import play.api.db.slick.{ DatabaseConfigProvider, HasDatabaseConfigProvider }
 import slick.jdbc.{ JdbcBackend, JdbcProfile }
 
-case class Rack(id: String, produced: Float, var currentHour: Long, var gpuList: Seq[Gpu])
+case class Rack(id: String, produced: Float, currentHour: String, gpuList: Seq[Gpu])
 
 case class RackRow(id: String, produced: Float, currentHour: Long)
 

@@ -8,7 +8,7 @@ GET     /                           controllers.HomeController.index
 POST    /api/setup                  controllers.HomeController.addRack
 GET     /api/all                    controllers.HomeController.all
 GET     /api/allGpu                 controllers.HomeController.allGpu
-GET     /api/racks                  controllers.HomeController.getRacks(at: Long)
+GET     /api/racks                  controllers.HomeController.getRacks(at: String)
 POST    /api/racks                  controllers.HomeController.addGpu
 
 # Map static resources from the /public folder to the /assets URL path

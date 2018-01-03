@@ -1,6 +1,7 @@
 package controllers
 
 import models._
+import models.helper.Util
 import play.api.i18n.I18nSupport
 import play.api.libs.functional.syntax._
 import play.api.libs.json._
@@ -37,7 +38,7 @@ class HomeController(cc: ControllerComponents, rackRepository: RackRepository, g
   implicit val rackWrites: Writes[Rack] = (
     (JsPath \ "id").write[String] and
       (JsPath \ "produced").write[Float] and
-      (JsPath \ "currentHour").write[Long] and
+      (JsPath \ "currentHour").write[String] and
       (JsPath \ "gpuList").write[Seq[Gpu]]
     ) (unlift(Rack.unapply))
 
@@ -45,7 +46,7 @@ class HomeController(cc: ControllerComponents, rackRepository: RackRepository, g
 
     (JsPath \ "id").read[String] and
       (JsPath \ "produced").read[Float] and
-      ((JsPath \ "currentHour").read[Long] or Reads.pure(System.currentTimeMillis)) and
+      (JsPath \ "currentHour").read[String] and
       ((JsPath \ "gpuList").read[Seq[Gpu]] or Reads.pure(Seq.empty[Gpu]))
     ) (Rack.apply _)
 
@@ -60,7 +61,7 @@ class HomeController(cc: ControllerComponents, rackRepository: RackRepository, g
         listGpu <- gpuSeqFuture
       } yield listGpu
       val result = Await.result(listGpu, 20 seconds)
-      val rack = Rack(r.id, r.produced, r.currentHour, result)
+      val rack = Rack(r.id, r.produced, Util.toDate(r.currentHour), result)
       println(rack)
       rackSeq = rackSeq :+ rack
     }
@@ -87,23 +88,29 @@ class HomeController(cc: ControllerComponents, rackRepository: RackRepository, g
       )
   }
 
-  def getRacks(at: Long) = Action.async {
-    implicit request: Request[AnyContent] =>
+  def getRacks(at: String) = Action { implicit request: Request[AnyContent] =>
       println(at)
-      val futureList = rackRepository.get(at)
-      val rackSeq: Seq[Rack] = Seq.empty
-      futureList.map {
-        list =>
-          list.foreach {
-            r =>
-              val gpuSeq = gpuRepository.getByRack(r.id)
-              gpuSeq.map {
-                gpuList =>
-                  rackSeq :+ Rack(r.id, r.produced, r.currentHour, gpuList)
-              }
-          }
-          Ok(Json.toJson(rackSeq)).as(JSON)
+      val time: Long = Util.toTime(at)
+      println(time)
+      println(Util.toDate(time))
+      val futureList = rackRepository.get(time)
+      val resultRack = Await.result(futureList, 20 seconds)
+      var rackSeq: Seq[Rack] = Seq.empty
+
+      if (resultRack.isEmpty) BadRequest("Rack not found")
+      else {
+        resultRack.foreach { r =>
+          val gpuSeqFuture = gpuRepository.getByRack(r.id)
+          val listGpu = for {
+            listGpu <- gpuSeqFuture
+          } yield listGpu
+          val result = Await.result(listGpu, 20 seconds)
+          val rack = Rack(r.id, r.produced, Util.toDate(r.currentHour), result)
+          println(rack)
+          rackSeq = rackSeq :+ rack
+        }
       }
+      Ok(Json.toJson(rackSeq)).as(JSON)
   }
 
   def addGpu() = Action(parse.json) {

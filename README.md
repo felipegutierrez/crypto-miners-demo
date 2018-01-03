@@ -28,59 +28,53 @@ curl -v --request POST --header "Content-Type: application/json" --data '{ "id":
 ```
 [
   {
-    "id": "rack-1",
-    "produced": 0.10000000149011612,
-    "currentHour": 1514991180180,
-    "gpuList": [
-      {
-        "id": "rack-1-gpu-0",
-        "rackId": "rack-1",
-        "produced": 0,
-        "installedAt": 1514991248162
-      },
-      {
-        "id": "rack-1-gpu-1",
-        "rackId": "rack-1",
-        "produced": 0,
-        "installedAt": 1514991251342
-      }
-    ]
+    "id": "rack-3",
+    "produced": 0.30000001192092896,
+    "currentHour": "2018-01-03T16:09:17.656Z",
+    "gpuList": []
   },
   {
     "id": "rack-2",
     "produced": 0.20000000298023224,
-    "currentHour": 1514991208519,
-    "gpuList": []
+    "currentHour": "2018-01-03T16:09:24.83Z",
+    "gpuList": [
+      {
+        "id": "rack-2-gpu-0",
+        "rackId": "rack-2",
+        "produced": 0,
+        "installedAt": 1515011288572
+      },
+      {
+        "id": "rack-2-gpu-1",
+        "rackId": "rack-2",
+        "produced": 0,
+        "installedAt": 1515011294311
+      }
+    ]
   }
 ]
 ```
 
 ### Listing specific rack:
-`curl http://localhost:9000/api/racks?at=1514991887142 | jq .`
+`curl http://localhost:9000/api/racks?at="2018-01-03T16:09:24.83Z" | jq .`
 ```
 [
   {
-    "id": "rack-1",
-    "produced": 0.10000000149011612,
-    "currentHour": 1514991887142,
+    "id": "rack-2",
+    "produced": 0.20000000298023224,
+    "currentHour": "2018-01-03T16:09:24.83Z",
     "gpuList": [
       {
-        "id": "rack-1-gpu-0",
-        "rackId": "rack-1",
+        "id": "rack-2-gpu-0",
+        "rackId": "rack-2",
         "produced": 0,
-        "installedAt": 1514991907235
+        "installedAt": 1515011288572
       },
       {
-        "id": "rack-1-gpu-1",
-        "rackId": "rack-1",
+        "id": "rack-2-gpu-1",
+        "rackId": "rack-2",
         "produced": 0,
-        "installedAt": 1514991908062
-      },
-      {
-        "id": "rack-1-gpu-2",
-        "rackId": "rack-1",
-        "produced": 0,
-        "installedAt": 1514991908660
+        "installedAt": 1515011294311
       }
     ]
   }
