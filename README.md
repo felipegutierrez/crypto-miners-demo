@@ -2,8 +2,14 @@
 
 ### Dependencies
  - Just to print pretty the json output: `yum install jq`
- - Open any browser and execute `http://localhost:9000/` to create the in-memory database.
+ - Scala version 2.12.3
+ - Sbt version 1.0
 
+### Executing
+ - Clone the project in your local machine.
+ - Use `sbt` to execute the project.
+ - Open any browser and execute `http://localhost:9000/` to create the in-memory database.
+ - Execute `curl` commands in you terminal.
 
 ### Adding racks
 ```
@@ -17,7 +23,8 @@ curl -v --request POST --header "Content-Type: application/json" --data '{ "id":
 curl -v --request POST --header "Content-Type: application/json" --data '{ "id": "rack-1", "produced":0.1 }' http://localhost:9000/api/racks
 ```
 
-### Listing all racks: `curl http://localhost:9000/api/all | jq .`
+### Listing all racks:
+`curl http://localhost:9000/api/all | jq .`
 ```
 [
   {
@@ -48,8 +55,8 @@ curl -v --request POST --header "Content-Type: application/json" --data '{ "id":
 ]
 ```
 
-
-### Listing specific rack: `curl http://localhost:9000/api/racks?at=1514991887142 | jq .`
+### Listing specific rack:
+`curl http://localhost:9000/api/racks?at=1514991887142 | jq .`
 ```
 [
   {

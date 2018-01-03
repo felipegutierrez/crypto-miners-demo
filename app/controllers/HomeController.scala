@@ -58,9 +58,13 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
     either.fold(
       errors => BadRequest("invalid json Rack"),
       rack => {
-        rack.currentHour = System.currentTimeMillis
-        rackRepository.+=(rack)
-        Ok
+        if (rackRepository.filter { r: Rack => r.id == rack.id }.size > 0) {
+          BadRequest("Rack id already exists")
+        } else {
+          rack.currentHour = System.currentTimeMillis
+          rackRepository.+=(rack)
+          Ok
+        }
       }
     )
   }
@@ -85,7 +89,7 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
             r.gpuList = r.gpuList :+ gpu
           }
         if (listRack.size == 0) {
-          NotFound
+          BadRequest("Rack not found")
         } else {
           Ok
         }
