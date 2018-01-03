@@ -6,10 +6,9 @@ import play.api.libs.functional.syntax._
 import play.api.libs.json._
 import play.api.mvc._
 
-import scala.concurrent.{Await, Future}
 import scala.concurrent.duration.DurationInt
-import scala.util.Failure
-import scala.util.Success
+import scala.concurrent.{Await, Future}
+import scala.util.{Failure, Success}
 
 class HomeController(cc: ControllerComponents, rackRepository: RackRepository, gpuRepository: GpuRepository)
   extends AbstractController(cc) with I18nSupport {
@@ -75,13 +74,15 @@ class HomeController(cc: ControllerComponents, rackRepository: RackRepository, g
       either.fold(
         errors => BadRequest("invalid json Rack"),
         rack => {
-          //        if (rackRepository.filter { r: Rack => r.id == rack.id }.size > 0) {
-          //          BadRequest("Rack id already exists")
-          //        } else {
-          val rackRow = RackRow(rack.id, rack.produced, System.currentTimeMillis)
-          rackRepository.insert(rackRow)
-          Ok
-          //        }
+          val f: Future[Option[RackRow]] = rackRepository.getById(rack.id)
+          val result = Await.result(f, 20 seconds)
+          result match {
+            case Some(r) => BadRequest("Rack already exists!")
+            case None => val rackRow = RackRow(rack.id, rack.produced, System.currentTimeMillis)
+              println("new rack")
+              rackRepository.insert(rackRow)
+              Ok
+          }
         }
       )
   }
