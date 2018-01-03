@@ -33,7 +33,7 @@ class ApplicationComponents(context: Context)
 
   applicationEvolutions
 
-  lazy val repositoryController = new controllers.HomeController(controllerComponents)
+  lazy val repositoryController = new controllers.HomeController(controllerComponents, rack, gpu)
 
   lazy val router = new _root_.router.Routes(httpErrorHandler, repositoryController, assets)
 
@@ -48,5 +48,9 @@ trait PersistenceComponents {
   lazy val defaultDbProvider = new DatabaseConfigProvider {
     def get[P <: BasicProfile]: DatabaseConfig[P] = slickApi.dbConfig[P](DbName("default"))
   }
+
+  lazy val rack = new models.RackRepository(defaultDbProvider)
+
+  lazy val gpu = new models.GpuRepository(defaultDbProvider)
 }
 
