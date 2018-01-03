@@ -15,7 +15,7 @@ libraryDependencies += filters
 libraryDependencies += "com.typesafe.play" %% "play-slick" % "3.0.0"
 libraryDependencies += "com.typesafe.play" %% "play-slick-evolutions" % "3.0.0"
 libraryDependencies += "org.xerial" % "sqlite-jdbc" % "3.19.3"
-// libraryDependencies += "com.h2database" % "h2" % "1.4.192"
+libraryDependencies += "com.h2database" % "h2" % "1.4.192"
 
 
 // Adds additional packages into Twirl

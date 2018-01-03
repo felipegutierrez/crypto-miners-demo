@@ -13,28 +13,24 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
 
   val rackRepository: mutable.MutableList[Rack] = new mutable.MutableList[Rack]()
 
-  /**
-    * Create an Action to render an HTML page.
-    *
-    * The configuration in the `routes` file means that this method
-    * will be called when the application receives a `GET` request with
-    * a path of `/`.
-    */
   def index() = Action { implicit request: Request[AnyContent] =>
     Ok(views.html.index())
   }
 
-  implicit val personWrites: Writes[Rack] = (
+  implicit val rackWrites: Writes[Rack] = (
     (JsPath \ "id").write[String] and
-      (JsPath \ "produced").write[Float]
+      (JsPath \ "produced").write[Float] and
+      (JsPath \ "currentHour").write[Long]
     ) (unlift(Rack.unapply))
 
-  implicit val personReads: Reads[Rack] = (
+  implicit val rackReads: Reads[Rack] = (
+
     (JsPath \ "id").read[String] and
-      (JsPath \ "produced").read[Float]
+      (JsPath \ "produced").read[Float] and
+      ((JsPath \ "currentHour").read[Long] or Reads.pure(System.currentTimeMillis))
     ) (Rack.apply _)
 
-  def allRacks = Action {
+  def all = Action {
     Ok(Json.toJson(rackRepository)).as(JSON)
   }
 
@@ -43,9 +39,16 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
     either.fold(
       errors => BadRequest("invalid json Rack"),
       rack => {
+        rack.currentHour = System.currentTimeMillis
         rackRepository.+=(rack)
         Ok
       }
     )
+  }
+
+  def getRacks(at: Long) = Action { request =>
+    println(at)
+    val list = rackRepository.filter { r: Rack => r.currentHour == at }
+    Ok(Json.toJson(list)).as(JSON)
   }
 }
