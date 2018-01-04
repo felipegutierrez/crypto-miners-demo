@@ -12,7 +12,7 @@
  - Execute `curl` commands in you terminal.
 
 ### Adding racks
-To add a Rack you only need to set its `id`. The other properties will be generated automatically as default values. You cannot insert duplicate Rack `id`.
+To add a Rack you only need to set its `id`. The other properties will be generated automatically as default values. You cannot insert duplicate Rack `id`. If you try to create a Rack with the same `id`, what you are doing is update the properties `prpduced` and `currentTime`.
 ```
 curl -v --request POST --header "Content-Type: application/json" --data '{ "id": "rack-1" }' http://localhost:9000/api/setup
 curl -v --request POST --header "Content-Type: application/json" --data '{ "id": "rack-2" }' http://localhost:9000/api/setup

@@ -39,6 +39,9 @@ class RackRepository (protected val dbConfigProvider: DatabaseConfigProvider)
   def updateProduced(rackId: String, produced: Float): Future[Unit] =
     db.run(RackTable.filter(_.id === rackId).map(r => r.produced).update(produced)).map(_ => ())
 
+  def updateRack(rackId: String, produced: Float, currentHour: Long): Future[Unit] =
+    db.run(RackTable.filter(_.id === rackId).map(r => (r.produced, r.currentHour)).update(produced, currentHour)).map(_ => ())
+
   def list(): Future[Seq[RackRow]] =
     db.run(RackTable.result)
 

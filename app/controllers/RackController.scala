@@ -75,8 +75,16 @@ class RackController(cc: ControllerComponents, rackRepository: RackRepository, g
           val f: Future[Option[RackRow]] = rackRepository.getById(rack.id)
           val result = Await.result(f, 20 seconds)
           result match {
-            case Some(r) => BadRequest("Rack already exists!")
-            case None => val rackRow = RackRow(rack.id, rack.produced, System.currentTimeMillis)
+            case Some(r) =>
+              // If the Rack already exists we update the produced and currentTime properties
+              val fGpu: Future[Seq[GpuRow]] = gpuRepository.getByRack(r.id)
+              val resultGpu = Await.result(fGpu, 20 seconds)
+              val total = resultGpu.map(_.produced).sum
+              rackRepository.updateRack(r.id, total, System.currentTimeMillis)
+              Ok("Rack already exists! Updated produced and currentTime.")
+            case None =>
+              // If the Rack does not exist we create it.
+              val rackRow = RackRow(rack.id, rack.produced, System.currentTimeMillis)
               rackRepository.insert(rackRow)
               Ok
           }
