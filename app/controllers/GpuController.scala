@@ -62,7 +62,7 @@ class GpuController(cc: ControllerComponents, rackRepository: RackRepository, gp
 
                       // update produced from Rack as a sum of all gpu produced
                       val total = seq.map(_.produced).sum + rack.produced
-                      rackRepository.updateProduced(r.id, total)
+                      rackRepository.update(r.id, Some(total), None)
                       Ok
                     case Failure(e) => BadRequest("Failure")
                   }
