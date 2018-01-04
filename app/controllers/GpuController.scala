@@ -56,9 +56,13 @@ class GpuController(cc: ControllerComponents, rackRepository: RackRepository, gp
                 case Some(r) =>
                   val fGpu: Future[Seq[GpuRow]] = gpuRepository.getByRack(r.id)
                   fGpu.onComplete {
-                    case Success(seq) => seq.size
+                    case Success(seq) =>
                       val gpuRow = GpuRow(r.id + "-gpu-" + seq.size, r.id, rack.produced, System.currentTimeMillis)
                       gpuRepository.insert(gpuRow)
+
+                      // update produced from Rack as a sum of all gpu produced
+                      val total = seq.map(_.produced).sum + rack.produced
+                      rackRepository.updateProduced(r.id, total)
                       Ok
                     case Failure(e) => BadRequest("Failure")
                   }
