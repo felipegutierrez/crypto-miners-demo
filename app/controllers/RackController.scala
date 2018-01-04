@@ -15,6 +15,8 @@ class RackController(cc: ControllerComponents, rackRepository: RackRepository, g
 
   implicit lazy val ec = cc.executionContext
 
+  val profitPerGpu: Float = 0.1235567.toFloat
+
   implicit val gpuWrites: Writes[Gpu] = (
     (JsPath \ "id").write[String] and
       (JsPath \ "rackId").write[String] and
@@ -45,6 +47,11 @@ class RackController(cc: ControllerComponents, rackRepository: RackRepository, g
       ((JsPath \ "gpuList").read[Seq[Gpu]] or Reads.pure(Seq.empty[Gpu]))
     ) (Rack.apply _)
 
+  implicit val setupWrites: Writes[Setup] = (
+    (JsPath \ "profitPerGpu").write[Float] and
+      ((JsPath \ "rackList").write[Seq[Rack]])
+    ) (unlift(Setup.unapply))
+
   def all = Action { implicit request: Request[AnyContent] =>
     val futureList = rackRepository.list()
     var rackSeq: Seq[Rack] = Seq.empty
@@ -63,7 +70,8 @@ class RackController(cc: ControllerComponents, rackRepository: RackRepository, g
       val rack = Rack(r.id, r.produced, Util.toDate(r.currentHour), gpuSeq)
       rackSeq = rackSeq :+ rack
     }
-    Ok(Json.toJson(rackSeq)).as(JSON)
+    val setup: Setup = Setup(profitPerGpu, rackSeq)
+    Ok(Json.toJson(setup)).as(JSON)
   }
 
   def addRack = Action(parse.json) {

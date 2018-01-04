@@ -9,142 +9,152 @@
  - Clone the project in your local machine.
  - Use `sbt` to execute the project.
  - Open any browser and execute `http://localhost:9000/` to create the in-memory database.
- - Execute `curl` commands in you terminal.
+ - Execute `curl` commands in you terminal: `curl http://localhost:9000/api/all | jq .`.
+```
+{
+  "profitPerGpu": 0.1235567033290863,
+  "rackList": []
+}
+```
 
 ### Adding racks
-To add a Rack you only need to set its `id`. The other properties will be generated automatically as default values. You cannot insert duplicate Rack `id`. If you try to create a Rack with the same `id`, what you are doing is update the properties `prpduced` and `currentTime`.
+To add a Rack you only need to set its `id`. The other properties will be generated automatically with default values. If the operation is successful you are going to see the output `HTTP/1.1 200 OK` on your console.
+
+You cannot insert duplicate Rack `id`. If you try to create a Rack with the same `id` the system is going to update the properties `prpduced` and `currentTime`. You are going to see the output `HTTP/1.1 200 OK` on your console.
 ```
 curl -v --request POST --header "Content-Type: application/json" --data '{ "id": "rack-1" }' http://localhost:9000/api/setup
 curl -v --request POST --header "Content-Type: application/json" --data '{ "id": "rack-2" }' http://localhost:9000/api/setup
 curl -v --request POST --header "Content-Type: application/json" --data '{ "id": "rack-3" }' http://localhost:9000/api/setup
+curl http://localhost:9000/api/all | jq .
+```
+```
+{
+  "profitPerGpu": 0.1235567033290863,
+  "rackList": [
+    {
+      "id": "rack-1",
+      "produced": 0,
+      "currentHour": "2018-01-04T10:10:05.598Z",
+      "gpuList": []
+    },
+    {
+      "id": "rack-2",
+      "produced": 0,
+      "currentHour": "2018-01-04T10:13:38.522Z",
+      "gpuList": []
+    }
+  ]
+}
 ```
 
 ### Adding Gpu to a rack
-You can add a Gpu with `produced` property or not. The default value for `produced` is `0` and this value will increase on the `produced` property of the Rack.
+You can add a Gpu with `produced` property or not. The default value for `produced` is `0`. This value will increase on the `produced` property of the Rack.
 ```
 curl -v --request POST --header "Content-Type: application/json" --data '{ "id": "rack-2", "produced": 0.3 }' http://localhost:9000/api/racks
-curl -v --request POST --header "Content-Type: application/json" --data '{ "id": "rack-2" }' http://localhost:9000/api/racks
+curl -v --request POST --header "Content-Type: application/json" --data '{ "id": "rack-2" }'http://localhost:9000/api/racks
+curl http://localhost:9000/api/all | jq .
+```
+```
+{
+  "profitPerGpu": 0.1235567033290863,
+  "rackList": [
+    {
+      "id": "rack-1",
+      "produced": 0,
+      "currentHour": "2018-01-04T10:10:05.598Z",
+      "gpuList": []
+    },
+    {
+      "id": "rack-2",
+      "produced": 0.30000001192092896,
+      "currentHour": "2018-01-04T10:13:38.522Z",
+      "gpuList": [
+        {
+          "id": "rack-2-gpu-0",
+          "rackId": "rack-2",
+          "produced": 0.30000001192092896,
+          "installedAt": "2018-01-04T10:14:45.494Z"
+        },
+        {
+          "id": "rack-2-gpu-1",
+          "rackId": "rack-2",
+          "produced": 0,
+          "installedAt": "2018-01-04T10:14:52.985Z"
+        }
+      ]
+    }
+  ]
+}
 ```
 
 ### Listing all racks:
 `curl http://localhost:9000/api/all | jq .`
 ```
+{
+  "profitPerGpu": 0.1235567033290863,
+  "rackList": [
+    {
+      "id": "rack-1",
+      "produced": 1.2999999523162842,
+      "currentHour": "2018-01-04T10:10:05.598Z",
+      "gpuList": [
+        {
+          "id": "rack-1-gpu-0",
+          "rackId": "rack-1",
+          "produced": 1.2999999523162842,
+          "installedAt": "2018-01-04T10:17:37.859Z"
+        }
+      ]
+    },
+    {
+      "id": "rack-2",
+      "produced": 0.30000001192092896,
+      "currentHour": "2018-01-04T10:13:38.522Z",
+      "gpuList": [
+        {
+          "id": "rack-2-gpu-0",
+          "rackId": "rack-2",
+          "produced": 0.30000001192092896,
+          "installedAt": "2018-01-04T10:14:45.494Z"
+        },
+        {
+          "id": "rack-2-gpu-1",
+          "rackId": "rack-2",
+          "produced": 0,
+          "installedAt": "2018-01-04T10:14:52.985Z"
+        }
+      ]
+    },
+    {
+      "id": "rack-3",
+      "produced": 0,
+      "currentHour": "2018-01-04T10:17:46.566Z",
+      "gpuList": []
+    }
+  ]
+}
+```
+
+### Listing specific rack:
+`curl http://localhost:9000/api/racks?at="2018-01-04T10:13:38.522Z" | jq .`
+```
 [
   {
-    "id": "rack-1",
-    "produced": 0,
-    "currentHour": "2018-01-03T22:35:40.907Z",
-    "gpuList": [
-      {
-        "id": "rack-1-gpu-0",
-        "rackId": "rack-1",
-        "produced": 0,
-        "installedAt": "2018-01-03T22:36:39.582Z"
-      },
-      {
-        "id": "rack-1-gpu-1",
-        "rackId": "rack-1",
-        "produced": 0,
-        "installedAt": "2018-01-03T22:36:44.876Z"
-      }
-    ]
-  },
-  {
     "id": "rack-2",
-    "produced": 1.2000000476837158,
-    "currentHour": "2018-01-03T22:37:05.225Z",
+    "produced": 0.30000001192092896,
+    "currentHour": "2018-01-04T10:13:38.522Z",
     "gpuList": [
       {
         "id": "rack-2-gpu-0",
         "rackId": "rack-2",
         "produced": 0.30000001192092896,
-        "installedAt": "2018-01-03T23:07:45.779Z"
+        "installedAt": "2018-01-04T10:14:45.494Z"
       },
       {
         "id": "rack-2-gpu-1",
         "rackId": "rack-2",
-        "produced": 0.30000001192092896,
-        "installedAt": "2018-01-03T23:08:43.563Z"
-      },
-      {
-        "id": "rack-2-gpu-2",
-        "rackId": "rack-2",
-        "produced": 0.30000001192092896,
-        "installedAt": "2018-01-04T08:46:29.678Z"
-      },
-      {
-        "id": "rack-2-gpu-3",
-        "rackId": "rack-2",
-        "produced": 0.30000001192092896,
-        "installedAt": "2018-01-04T09:03:09.979Z"
-      }
-    ]
-  }
-]
-```
-
-### Listing specific rack:
-`curl http://localhost:9000/api/racks?at="2018-01-03T22:37:09.219Z" | jq .`
-```
-[
-  {
-    "id": "rack-3",
-    "produced": 0.6000000238418579,
-    "currentHour": "2018-01-03T22:37:09.219Z",
-    "gpuList": [
-      {
-        "id": "rack-3-gpu-0",
-        "rackId": "rack-3",
         "produced": 0,
-        "installedAt": "2018-01-03T23:00:58.87Z"
-      },
-      {
-        "id": "rack-3-gpu-1",
-        "rackId": "rack-3",
-        "produced": 0,
-        "installedAt": "2018-01-03T23:01:40.330Z"
-      },
-      {
-        "id": "rack-3-gpu-2",
-        "rackId": "rack-3",
-        "produced": 0,
-        "installedAt": "2018-01-03T23:03:48.647Z"
-      },
-      {
-        "id": "rack-3-gpu-3",
-        "rackId": "rack-3",
-        "produced": 0,
-        "installedAt": "2018-01-03T23:05:02.21Z"
-      },
-      {
-        "id": "rack-3-gpu-4",
-        "rackId": "rack-3",
-        "produced": 0,
-        "installedAt": "2018-01-03T23:05:16.947Z"
-      },
-      {
-        "id": "rack-3-gpu-5",
-        "rackId": "rack-3",
-        "produced": 0,
-        "installedAt": "2018-01-03T23:05:29.817Z"
-      },
-      {
-        "id": "rack-3-gpu-6",
-        "rackId": "rack-3",
-        "produced": 0.30000001192092896,
-        "installedAt": "2018-01-03T23:07:24.173Z"
-      },
-      {
-        "id": "rack-3-gpu-7",
-        "rackId": "rack-3",
-        "produced": 0.30000001192092896,
-        "installedAt": "2018-01-04T09:04:51.558Z"
-      },
-      {
-        "id": "rack-3-gpu-8",
-        "rackId": "rack-3",
-        "produced": 0,
-        "installedAt": "2018-01-04T09:06:13.478Z"
+        "installedAt": "2018-01-04T10:14:52.985Z"
       }
     ]
   }
@@ -156,28 +166,22 @@ curl -v --request POST --header "Content-Type: application/json" --data '{ "id":
 ```
 [
   {
+    "id": "rack-2-gpu-0",
+    "rackId": "rack-2",
+    "produced": 0.30000001192092896,
+    "installedAt": "2018-01-04T10:14:45.494Z"
+  },
+  {
+    "id": "rack-2-gpu-1",
+    "rackId": "rack-2",
+    "produced": 0,
+    "installedAt": "2018-01-04T10:14:52.985Z"
+  },
+  {
     "id": "rack-1-gpu-0",
     "rackId": "rack-1",
-    "produced": 0,
-    "installedAt": "2018-01-03T22:36:39.582Z"
-  },
-  {
-    "id": "rack-1-gpu-1",
-    "rackId": "rack-1",
-    "produced": 0,
-    "installedAt": "2018-01-03T22:36:44.876Z"
-  },
-  {
-    "id": "rack-3-gpu-0",
-    "rackId": "rack-3",
-    "produced": 0,
-    "installedAt": "2018-01-03T23:00:58.87Z"
-  },
-  {
-    "id": "rack-3-gpu-1",
-    "rackId": "rack-3",
-    "produced": 0,
-    "installedAt": "2018-01-03T23:01:40.330Z"
+    "produced": 1.2999999523162842,
+    "installedAt": "2018-01-04T10:17:37.859Z"
   }
 ]
 ```
