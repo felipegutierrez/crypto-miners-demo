@@ -20,7 +20,7 @@ curl -v --request POST --header "Content-Type: application/json" --data '{ "id":
 
 ### Adding Gpu to a rack
 ```
-curl -v --request POST --header "Content-Type: application/json" --data '{ "id": "rack-1" }' http://localhost:9000/api/racks
+curl -v --request POST --header "Content-Type: application/json" --data '{ "id": "rack-2", "produced": 0.3 }' http://localhost:9000/api/racks
 ```
 
 ### Listing all racks:
