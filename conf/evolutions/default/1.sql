@@ -20,4 +20,3 @@ CREATE TABLE "gpu"
 DROP TABLE "rack";
 
 DROP TABLE "gpu";
-

@@ -33,9 +33,13 @@ class ApplicationComponents(context: Context)
 
   applicationEvolutions
 
-  lazy val repositoryController = new controllers.HomeController(controllerComponents, rack, gpu)
+  lazy val repositoryController = new controllers.HomeController(controllerComponents)
 
-  lazy val router = new _root_.router.Routes(httpErrorHandler, repositoryController, assets)
+  lazy val rackController = new controllers.RackController(controllerComponents, rack, gpu)
+
+  lazy val gpuController = new controllers.GpuController(controllerComponents, rack, gpu)
+
+  lazy val router = new _root_.router.Routes(httpErrorHandler, repositoryController, rackController, gpuController, assets)
 
 }
 
