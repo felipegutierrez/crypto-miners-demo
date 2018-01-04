@@ -8,7 +8,7 @@
 ### Executing
  - Clone the project in your local machine.
  - Use `sbt` to execute the project.
- - Open any browser and execute `http://localhost:9000/` to create the in-memory database.
+ - Open any browser and execute `http://localhost:9000/` to create the in-memory database: `Apply this script now!`.
  - Execute `curl` commands in you terminal: `curl http://localhost:9000/api/all | jq .`.
 ```
 {
