@@ -42,13 +42,13 @@ curl -v --request POST --header "Content-Type: application/json" --data '{ "id":
         "id": "rack-2-gpu-0",
         "rackId": "rack-2",
         "produced": 0,
-        "installedAt": 1515011288572
+        "installedAt": "2018-01-03T23:07:45.779Z"
       },
       {
         "id": "rack-2-gpu-1",
         "rackId": "rack-2",
         "produced": 0,
-        "installedAt": 1515011294311
+        "installedAt": "2018-01-03T23:07:45.779Z"
       }
     ]
   }
@@ -68,13 +68,13 @@ curl -v --request POST --header "Content-Type: application/json" --data '{ "id":
         "id": "rack-2-gpu-0",
         "rackId": "rack-2",
         "produced": 0,
-        "installedAt": 1515011288572
+        "installedAt": "2018-01-03T23:07:45.779Z"
       },
       {
         "id": "rack-2-gpu-1",
         "rackId": "rack-2",
         "produced": 0,
-        "installedAt": 1515011294311
+        "installedAt": "2018-01-03T23:07:45.779Z"
       }
     ]
   }
@@ -84,7 +84,32 @@ curl -v --request POST --header "Content-Type: application/json" --data '{ "id":
 ### Listing all gpu's:
 `curl http://localhost:9000/api/allGpu | jq .`
 ```
-
+[
+  {
+    "id": "rack-1-gpu-0",
+    "rackId": "rack-1",
+    "produced": 0,
+    "installedAt": "2018-01-03T22:36:39.582Z"
+  },
+  {
+    "id": "rack-1-gpu-1",
+    "rackId": "rack-1",
+    "produced": 0,
+    "installedAt": "2018-01-03T22:36:44.876Z"
+  },
+  {
+    "id": "rack-3-gpu-0",
+    "rackId": "rack-3",
+    "produced": 0,
+    "installedAt": "2018-01-03T23:00:58.87Z"
+  },
+  {
+    "id": "rack-3-gpu-1",
+    "rackId": "rack-3",
+    "produced": 0,
+    "installedAt": "2018-01-03T23:01:40.330Z"
+  }
+]
 ```
 
 

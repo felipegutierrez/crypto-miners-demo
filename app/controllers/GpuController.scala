@@ -57,7 +57,7 @@ class GpuController(cc: ControllerComponents, rackRepository: RackRepository, gp
                   val fGpu: Future[Seq[GpuRow]] = gpuRepository.getByRack(r.id)
                   fGpu.onComplete {
                     case Success(seq) => seq.size
-                      val gpuRow = GpuRow(r.id + "-gpu-" + seq.size, r.id, 0, System.currentTimeMillis)
+                      val gpuRow = GpuRow(r.id + "-gpu-" + seq.size, r.id, rack.produced, System.currentTimeMillis)
                       gpuRepository.insert(gpuRow)
                       Ok
                     case Failure(e) => BadRequest("Failure")
