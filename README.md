@@ -84,25 +84,67 @@ curl -v --request POST --header "Content-Type: application/json" --data '{ "id":
 ```
 
 ### Listing specific rack:
-`curl http://localhost:9000/api/racks?at="2018-01-03T16:09:24.83Z" | jq .`
+`curl http://localhost:9000/api/racks?at="2018-01-03T22:37:09.219Z" | jq .`
 ```
 [
   {
-    "id": "rack-2",
-    "produced": 0.20000000298023224,
-    "currentHour": "2018-01-03T16:09:24.83Z",
+    "id": "rack-3",
+    "produced": 0.6000000238418579,
+    "currentHour": "2018-01-03T22:37:09.219Z",
     "gpuList": [
       {
-        "id": "rack-2-gpu-0",
-        "rackId": "rack-2",
+        "id": "rack-3-gpu-0",
+        "rackId": "rack-3",
         "produced": 0,
-        "installedAt": "2018-01-03T23:07:45.779Z"
+        "installedAt": "2018-01-03T23:00:58.87Z"
       },
       {
-        "id": "rack-2-gpu-1",
-        "rackId": "rack-2",
+        "id": "rack-3-gpu-1",
+        "rackId": "rack-3",
         "produced": 0,
-        "installedAt": "2018-01-03T23:07:45.779Z"
+        "installedAt": "2018-01-03T23:01:40.330Z"
+      },
+      {
+        "id": "rack-3-gpu-2",
+        "rackId": "rack-3",
+        "produced": 0,
+        "installedAt": "2018-01-03T23:03:48.647Z"
+      },
+      {
+        "id": "rack-3-gpu-3",
+        "rackId": "rack-3",
+        "produced": 0,
+        "installedAt": "2018-01-03T23:05:02.21Z"
+      },
+      {
+        "id": "rack-3-gpu-4",
+        "rackId": "rack-3",
+        "produced": 0,
+        "installedAt": "2018-01-03T23:05:16.947Z"
+      },
+      {
+        "id": "rack-3-gpu-5",
+        "rackId": "rack-3",
+        "produced": 0,
+        "installedAt": "2018-01-03T23:05:29.817Z"
+      },
+      {
+        "id": "rack-3-gpu-6",
+        "rackId": "rack-3",
+        "produced": 0.30000001192092896,
+        "installedAt": "2018-01-03T23:07:24.173Z"
+      },
+      {
+        "id": "rack-3-gpu-7",
+        "rackId": "rack-3",
+        "produced": 0.30000001192092896,
+        "installedAt": "2018-01-04T09:04:51.558Z"
+      },
+      {
+        "id": "rack-3-gpu-8",
+        "rackId": "rack-3",
+        "produced": 0,
+        "installedAt": "2018-01-04T09:06:13.478Z"
       }
     ]
   }
