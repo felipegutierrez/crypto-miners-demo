@@ -1,5 +1,6 @@
 package controllers
 
+import java.text.ParseException
 import javax.inject._
 
 import models._
@@ -11,7 +12,6 @@ import play.api.mvc._
 
 import scala.concurrent.duration.DurationInt
 import scala.concurrent.{Await, Future}
-import scala.util.{Failure, Success}
 
 class GpuController @Inject()(cc: ControllerComponents, rackRepository: RackRepository, gpuRepository: GpuRepository)
   extends AbstractController(cc) with I18nSupport {
@@ -51,28 +51,33 @@ class GpuController @Inject()(cc: ControllerComponents, rackRepository: RackRepo
       either.fold(
         errors => BadRequest("invalid json Rack"),
         rack => {
-          val f: Future[Option[RackRow]] = rackRepository.getById(rack.id)
-          f.onComplete {
-            case Success(value) =>
-              value match {
-                case Some(r) =>
-                  val fGpu: Future[Seq[GpuRow]] = gpuRepository.getByRack(r.id)
-                  fGpu.onComplete {
-                    case Success(seq) =>
-                      val gpuRow = GpuRow(r.id + "-gpu-" + seq.size, r.id, rack.produced, Util.toTime(rack.currentHour))
-                      gpuRepository.insert(gpuRow)
-
-                      // update produced from Rack as a sum of all gpu produced
-                      val total = seq.map(_.produced).sum + rack.produced
-                      rackRepository.update(r.id, Some(total), None)
-                    // Ok
-                    case Failure(e) => BadRequest("Failure")
-                  }
-                case None => BadRequest("Rack not found")
+          try {
+            val futureResult = for {
+              futureRackRow <- rackRepository.getById(rack.id) recoverWith {
+                case e: Exception => Future.failed(new Exception("Error on select Rack."))
               }
-            case Failure(e) => BadRequest("Failure")
+              futureSeqGpuRow <- gpuRepository.getByRack(futureRackRow.get.id) recoverWith {
+                case e: Exception => Future.failed(new Exception("Error on select Gpu's from Rack."))
+              }
+            } yield (futureRackRow, futureSeqGpuRow)
+            val result = Await.result(futureResult, 20 seconds)
+
+            result._1 match {
+              case Some(rackRow) =>
+                // Insert Gpu in the Rack
+                val gpuRow = GpuRow(rackRow.id + "-gpu-" + result._2.size, rackRow.id, rack.produced, Util.toTime(rack.currentHour))
+                gpuRepository.insert(gpuRow)
+
+                // update produced from Rack as a sum of all gpu produced
+                val total = result._2.map(_.produced).sum + rack.produced
+                rackRepository.update(rackRow.id, Some(total), None)
+              case None => BadRequest("Rack not found")
+            }
+            Ok
+          } catch {
+            case pe: ParseException => BadRequest(s"Could not parse the date: ${pe.getMessage}")
+            case e: Exception => BadRequest(s"Exception found: ${e.getMessage}")
           }
-          Ok
         }
       )
   }
