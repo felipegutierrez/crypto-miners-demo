@@ -9,8 +9,9 @@ import play.api.mvc._
 
 import scala.concurrent.duration.DurationInt
 import scala.concurrent.{Await, Future}
+import javax.inject._
 
-class RackController(cc: ControllerComponents, rackRepository: RackRepository, gpuRepository: GpuRepository)
+class RackController @Inject()(cc: ControllerComponents, rackRepository: RackRepository, gpuRepository: GpuRepository)
   extends AbstractController(cc) with I18nSupport {
 
   implicit lazy val ec = cc.executionContext

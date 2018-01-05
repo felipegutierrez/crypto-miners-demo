@@ -2,8 +2,9 @@ package controllers
 
 import play.api.i18n.I18nSupport
 import play.api.mvc._
+import javax.inject._
 
-class HomeController(cc: ControllerComponents) extends AbstractController(cc) with I18nSupport {
+class HomeController @Inject()(cc: ControllerComponents) extends AbstractController(cc) with I18nSupport {
 
   implicit lazy val ec = cc.executionContext
 

@@ -4,12 +4,13 @@ import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
 import slick.jdbc.{JdbcBackend, JdbcProfile}
 
 import scala.concurrent.{ExecutionContext, Future}
+import javax.inject._
 
 case class Rack(id: String, produced: Float, currentHour: String, gpuList: Seq[Gpu])
 
 case class RackRow(id: String, produced: Float, currentHour: Long)
 
-class RackRepository(protected val dbConfigProvider: DatabaseConfigProvider)
+class RackRepository @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)
                     (implicit ec: ExecutionContext) extends HasDatabaseConfigProvider[JdbcProfile] {
 
   import profile.api._

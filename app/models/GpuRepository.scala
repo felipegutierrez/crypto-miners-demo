@@ -1,16 +1,16 @@
 package models
 
-
 import scala.concurrent.{ ExecutionContext, Future }
 
 import play.api.db.slick.{ DatabaseConfigProvider, HasDatabaseConfigProvider }
 import slick.jdbc.{ JdbcBackend, JdbcProfile }
+import javax.inject._
 
 case class Gpu(id: String, rackId: String, produced: Float, installedAt: String)
 
 case class GpuRow(id: String, rackId: String, produced: Float, installedAt: Long)
 
-class GpuRepository (protected val dbConfigProvider: DatabaseConfigProvider)
+class GpuRepository @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)
                     (implicit ec: ExecutionContext) extends HasDatabaseConfigProvider[JdbcProfile] {
 
   import profile.api._
