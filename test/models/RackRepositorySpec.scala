@@ -3,7 +3,6 @@ package models
 import org.scalatestplus.play.PlaySpec
 import org.scalatestplus.play.guice.GuiceOneAppPerTest
 import play.api.db.evolutions._
-import play.api.db.slick.DatabaseConfigProvider
 import play.api.db.{Database, Databases}
 import play.api.inject.bind
 import play.api.inject.guice.GuiceInjectorBuilder
@@ -26,16 +25,17 @@ class RackRepositorySpec extends PlaySpec with GuiceOneAppPerTest with Injecting
   // val defaultDbProvider = guice.instanceOf[DatabaseConfigProvider]
 
   def beforeAll() = Evolutions.applyEvolutions(database)
+
   def afterAll() = {
-    Evolutions.cleanupEvolutions(database)
+    // Evolutions.cleanupEvolutions(database)
     database.shutdown()
   }
 
-//  Evolution(
-//    1,
-//    "create table test (id bigint not null, name varchar(255));",
-//    "drop table test;"
-//  )
+  Evolution(
+    1,
+    "create table test (id bigint not null, name varchar(255));",
+    "drop table test;"
+  )
 
   //  "RackController GET" should {
   //    "render the rack page from a new instance of controller" in {

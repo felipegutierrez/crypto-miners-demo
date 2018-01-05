@@ -1,15 +1,11 @@
 package controllers
 
-import models.{GpuRepository, RackRepository}
-import org.h2.engine.Mode
-import org.scalatest.prop.Configuration
 import org.scalatestplus.play._
 import org.scalatestplus.play.guice._
 import play.api.db.evolutions.Evolutions
 import play.api.db.{Database, Databases}
-import play.api.inject.guice.GuiceInjectorBuilder
 import play.api.inject.bind
-import play.api.test.Helpers._
+import play.api.inject.guice.GuiceInjectorBuilder
 import play.api.test._
 
 class RackControllerSpec extends PlaySpec with GuiceOneAppPerTest with Injecting {
@@ -28,13 +24,14 @@ class RackControllerSpec extends PlaySpec with GuiceOneAppPerTest with Injecting
     .injector()
   //  val rack = guice.instanceOf[RackRepository]
   //  val gpu = guice.instanceOf[GpuRepository]
-  //
-  //  def beforeAll() = Evolutions.applyEvolutions(database)
-  //  def afterAll() = {
-  //    // Evolutions.cleanupEvolutions(database)
-  //    database.shutdown()
-  //  }
-  //
+
+  def beforeAll() = Evolutions.applyEvolutions(database)
+
+  def afterAll() = {
+    // Evolutions.cleanupEvolutions(database)
+    database.shutdown()
+  }
+
   //  "RackController GET" should {
   //    "render the rack page from a new instance of controller" in {
   //      val controller = new RackController(stubControllerComponents(), rack, gpu)

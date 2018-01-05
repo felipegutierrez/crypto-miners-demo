@@ -1,5 +1,7 @@
 package controllers
 
+import javax.inject._
+
 import models._
 import models.helper.Util
 import play.api.i18n.I18nSupport
@@ -10,7 +12,6 @@ import play.api.mvc._
 import scala.concurrent.duration.DurationInt
 import scala.concurrent.{Await, Future}
 import scala.util.{Failure, Success}
-import javax.inject._
 
 class GpuController @Inject()(cc: ControllerComponents, rackRepository: RackRepository, gpuRepository: GpuRepository)
   extends AbstractController(cc) with I18nSupport {
@@ -58,13 +59,13 @@ class GpuController @Inject()(cc: ControllerComponents, rackRepository: RackRepo
                   val fGpu: Future[Seq[GpuRow]] = gpuRepository.getByRack(r.id)
                   fGpu.onComplete {
                     case Success(seq) =>
-                      val gpuRow = GpuRow(r.id + "-gpu-" + seq.size, r.id, rack.produced, System.currentTimeMillis)
+                      val gpuRow = GpuRow(r.id + "-gpu-" + seq.size, r.id, rack.produced, Util.toTime(rack.currentHour))
                       gpuRepository.insert(gpuRow)
 
                       // update produced from Rack as a sum of all gpu produced
                       val total = seq.map(_.produced).sum + rack.produced
                       rackRepository.update(r.id, Some(total), None)
-                      Ok
+                    // Ok
                     case Failure(e) => BadRequest("Failure")
                   }
                 case None => BadRequest("Rack not found")
