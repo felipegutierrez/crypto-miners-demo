@@ -10,8 +10,9 @@ import play.api.libs.functional.syntax._
 import play.api.libs.json._
 import play.api.mvc._
 
-import scala.concurrent.duration.DurationInt
-import scala.concurrent.{Await, Future}
+import scala.concurrent.Await
+import scala.concurrent.duration.{Duration, DurationInt}
+import scala.util.{Failure, Success, Try}
 
 class GpuController @Inject()(cc: ControllerComponents, rackRepository: RackRepository, gpuRepository: GpuRepository)
   extends AbstractController(cc) with I18nSupport {
@@ -54,12 +55,13 @@ class GpuController @Inject()(cc: ControllerComponents, rackRepository: RackRepo
           try {
             val futureResult = for {
               futureRackRow <- rackRepository.getById(rack.id) recoverWith {
-                case e: Exception => Future.failed(new Exception("Error on select Rack."))
+                case e: Exception => throw RackException(s"Error on select Rack: ${e.getMessage}")
               }
               futureSeqGpuRow <- gpuRepository.getByRack(futureRackRow.get.id) recoverWith {
-                case e: Exception => Future.failed(new Exception("Error on select Gpu's from Rack."))
+                case e: Exception => throw GpuException(s"Error on select Gpu's from Rack: ${e.getMessage}")
               }
             } yield (futureRackRow, futureSeqGpuRow)
+
             val result = Await.result(futureResult, 20 seconds)
 
             result._1 match {
@@ -76,6 +78,8 @@ class GpuController @Inject()(cc: ControllerComponents, rackRepository: RackRepo
             Ok
           } catch {
             case pe: ParseException => BadRequest(s"Could not parse the date: ${pe.getMessage}")
+            case re: RackException => BadRequest(s"Rack Exception: ${re.getMessage}")
+            case ge: GpuException => BadRequest(s"Gpu Exception: ${ge.getMessage}")
             case e: Exception => BadRequest(s"Exception found: ${e.getMessage}")
           }
         }

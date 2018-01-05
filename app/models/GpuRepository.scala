@@ -10,6 +10,8 @@ case class Gpu(id: String, rackId: String, produced: Float, installedAt: String)
 
 case class GpuRow(id: String, rackId: String, produced: Float, installedAt: Long)
 
+case class GpuException(message: String) extends Exception(message)
+
 class GpuRepository @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)
                     (implicit ec: ExecutionContext) extends HasDatabaseConfigProvider[JdbcProfile] {
 

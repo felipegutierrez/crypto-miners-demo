@@ -10,6 +10,8 @@ case class Rack(id: String, produced: Float, currentHour: String, gpuList: Seq[G
 
 case class RackRow(id: String, produced: Float, currentHour: Long)
 
+case class RackException(message: String) extends Exception(message)
+
 class RackRepository @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)
                     (implicit ec: ExecutionContext) extends HasDatabaseConfigProvider[JdbcProfile] {
 
