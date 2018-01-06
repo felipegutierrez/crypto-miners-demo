@@ -18,8 +18,6 @@ class RackController @Inject()(cc: ControllerComponents, rackRepository: RackRep
 
   implicit lazy val ec = cc.executionContext
 
-  val profitPerGpu: Float = 0.1235567.toFloat
-
   def all = Action { implicit request: Request[AnyContent] =>
     val futureList = rackRepository.list()
     var rackSeq: Seq[Rack] = Seq.empty
@@ -38,7 +36,7 @@ class RackController @Inject()(cc: ControllerComponents, rackRepository: RackRep
       val rack = Rack(r.id, r.produced, Util.toDate(r.currentHour), gpuSeq)
       rackSeq = rackSeq :+ rack
     }
-    val setup: Setup = Setup(profitPerGpu, rackSeq)
+    val setup: Setup = Setup(rackRepository.getProfitPerGpu, rackSeq)
     Ok(Json.toJson(setup)).as(JSON)
   }
 

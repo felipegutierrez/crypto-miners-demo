@@ -23,6 +23,8 @@ class RackRepository @Inject()(protected val dbConfigProvider: DatabaseConfigPro
 
   def database: JdbcBackend#DatabaseDef = db
 
+  def getProfitPerGpu: Float = 0.1235567.toFloat
+
   def create(row: List[RackRow]): Future[Option[Int]] =
     db.run(RackTable ++= row)
 

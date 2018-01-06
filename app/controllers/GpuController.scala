@@ -44,12 +44,17 @@ class GpuController @Inject()(cc: ControllerComponents, rackRepository: RackRepo
                 if (Util.toTime(gpu.installedAt) < rackRow.currentHour) {
                   throw GpuException("Given time is not after the currentHour.")
                 }
+                // Calculate the Gpu produced based on the profitPerGpu
+                val produced = if (gpu.produced == 0.toFloat) {
+                  val times = ((Util.toTime(gpu.installedAt) - rackRow.currentHour) / 3600000) + 1
+                  rackRepository.getProfitPerGpu * times
+                } else gpu.produced
                 // Insert Gpu in the Rack
-                val gpuRow = GpuRow(rackRow.id + "-gpu-" + result._2.size, rackRow.id, gpu.produced, Util.toTime(gpu.installedAt))
+                val gpuRow = GpuRow(rackRow.id + "-gpu-" + result._2.size, rackRow.id, produced, Util.toTime(gpu.installedAt))
                 gpuRepository.insert(gpuRow)
 
                 // update produced from Rack as a sum of all gpu produced
-                val total = result._2.map(_.produced).sum + gpu.produced
+                val total = result._2.map(_.produced).sum + produced
                 rackRepository.update(rackRow.id, Some(total), None)
               case None => BadRequest("Rack not found")
             }
