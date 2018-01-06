@@ -142,6 +142,7 @@ curl -v --request POST --header "Content-Type: application/json" --data '{ "id":
 ```
 
 ### Listing specific rack:
+If you try to pass a wrong String representation of time you are going to receive `Rack not found` or `Error on parse String to time.`.
 `curl http://localhost:9000/api/racks?at="2018-01-04T10:13:38.522Z" | jq .`
 ```
 [
