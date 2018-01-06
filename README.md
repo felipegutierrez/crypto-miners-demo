@@ -193,4 +193,8 @@ If you try to pass a wrong String representation of time you are going to receiv
 ]
 ```
 
+### Testing Controllers:
+To test the controllers execute `sbt test`.
+
+
 

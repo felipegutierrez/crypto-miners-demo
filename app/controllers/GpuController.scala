@@ -4,9 +4,9 @@ import java.text.ParseException
 import javax.inject._
 
 import models._
+import models.helper.ReadsWrites.{gpuWrites, rackReads}
 import models.helper.Util
 import play.api.i18n.I18nSupport
-import play.api.libs.functional.syntax._
 import play.api.libs.json._
 import play.api.mvc._
 
@@ -21,29 +21,6 @@ class GpuController @Inject()(cc: ControllerComponents, rackRepository: RackRepo
   def index() = Action { implicit request: Request[AnyContent] =>
     Ok(views.html.index())
   }
-
-  implicit val gpuWrites: Writes[Gpu] = (
-    (JsPath \ "id").write[String] and
-      (JsPath \ "rackId").write[String] and
-      (JsPath \ "produced").write[Float] and
-      (JsPath \ "installedAt").write[String]
-    ) (unlift(Gpu.unapply))
-
-  implicit val gpuReads: Reads[Gpu] = (
-
-    (JsPath \ "id").read[String] and
-      (JsPath \ "rackId").read[String] and
-      (JsPath \ "produced").read[Float] and
-      (JsPath \ "installedAt").read[String]
-    ) (Gpu.apply _)
-
-  implicit val rackReads: Reads[Rack] = (
-
-    (JsPath \ "id").read[String] and
-      ((JsPath \ "produced").read[Float] or Reads.pure(0.toFloat)) and
-      ((JsPath \ "currentHour").read[String] or Reads.pure(Util.toDate(System.currentTimeMillis))) and
-      ((JsPath \ "gpuList").read[Seq[Gpu]] or Reads.pure(Seq.empty[Gpu]))
-    ) (Rack.apply _)
 
   def addGpu() = Action(parse.json) {
     request =>
