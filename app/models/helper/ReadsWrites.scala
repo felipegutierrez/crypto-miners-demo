@@ -5,6 +5,13 @@ import play.api.libs.functional.syntax._
 import play.api.libs.json.{JsPath, Reads, Writes}
 
 object ReadsWrites {
+  implicit val gpuReads: Reads[Gpu] = (
+    ((JsPath \ "id").read[String] or Reads.pure("")) and
+      (JsPath \ "rackId").read[String] and
+      ((JsPath \ "produced").read[Float] or Reads.pure(0.toFloat)) and
+      ((JsPath \ "installedAt").read[String] or Reads.pure(Util.toDate(System.currentTimeMillis)))
+    ) (Gpu.apply _)
+
   implicit val gpuWrites: Writes[Gpu] = (
     (JsPath \ "id").write[String] and
       (JsPath \ "rackId").write[String] and
@@ -12,16 +19,7 @@ object ReadsWrites {
       (JsPath \ "installedAt").write[String]
     ) (unlift(Gpu.unapply))
 
-  implicit val gpuReads: Reads[Gpu] = (
-
-    (JsPath \ "id").read[String] and
-      (JsPath \ "rackId").read[String] and
-      (JsPath \ "produced").read[Float] and
-      (JsPath \ "installedAt").read[String]
-    ) (Gpu.apply _)
-
   implicit val rackReads: Reads[Rack] = (
-
     (JsPath \ "id").read[String] and
       ((JsPath \ "produced").read[Float] or Reads.pure(0.toFloat)) and
       ((JsPath \ "currentHour").read[String] or Reads.pure(Util.toDate(System.currentTimeMillis))) and
@@ -39,5 +37,4 @@ object ReadsWrites {
     (JsPath \ "profitPerGpu").write[Float] and
       ((JsPath \ "rackList").write[Seq[Rack]])
     ) (unlift(Setup.unapply))
-
 }

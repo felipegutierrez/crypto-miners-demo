@@ -4,7 +4,7 @@ import java.text.ParseException
 import javax.inject._
 
 import models._
-import models.helper.ReadsWrites.{gpuWrites, rackReads}
+import models.helper.ReadsWrites.{gpuReads, gpuWrites}
 import models.helper.Util
 import play.api.i18n.I18nSupport
 import play.api.libs.json._
@@ -24,13 +24,13 @@ class GpuController @Inject()(cc: ControllerComponents, rackRepository: RackRepo
 
   def addGpu() = Action(parse.json) {
     request =>
-      val either = request.body.validate[Rack]
+      val either = request.body.validate[Gpu]
       either.fold(
-        errors => BadRequest("invalid json Rack"),
-        rack => {
+        errors => BadRequest("invalid json Gpu"),
+        gpu => {
           try {
             val futureResult = for {
-              futureRackRow <- rackRepository.getById(rack.id) recoverWith {
+              futureRackRow <- rackRepository.getById(gpu.rackId) recoverWith {
                 case e: Exception => throw RackException(s"Error on select Rack: ${e.getMessage}")
               }
               futureSeqGpuRow <- gpuRepository.getByRack(futureRackRow.get.id) recoverWith {
@@ -40,12 +40,16 @@ class GpuController @Inject()(cc: ControllerComponents, rackRepository: RackRepo
             val result = Await.result(futureResult, 20 seconds)
             result._1 match {
               case Some(rackRow) =>
+                // given time (should be after currentHour, which was set during setup)
+                if (Util.toTime(gpu.installedAt) < rackRow.currentHour) {
+                  throw GpuException("Given time is not after the currentHour.")
+                }
                 // Insert Gpu in the Rack
-                val gpuRow = GpuRow(rackRow.id + "-gpu-" + result._2.size, rackRow.id, rack.produced, Util.toTime(rack.currentHour))
+                val gpuRow = GpuRow(rackRow.id + "-gpu-" + result._2.size, rackRow.id, gpu.produced, Util.toTime(gpu.installedAt))
                 gpuRepository.insert(gpuRow)
 
                 // update produced from Rack as a sum of all gpu produced
-                val total = result._2.map(_.produced).sum + rack.produced
+                val total = result._2.map(_.produced).sum + gpu.produced
                 rackRepository.update(rackRow.id, Some(total), None)
               case None => BadRequest("Rack not found")
             }

@@ -50,9 +50,9 @@ curl http://localhost:9000/api/all | jq .
 ### Adding Gpu to a rack
 You can add a Gpu to a Rack by identifying the RackID. The properties `produced` and `currentHoour` are optional. The default value for them are respectively `0` and the current day/hour. This value of `produced` property is going to increase on the Rack `produced` property.
 ```
-curl -v --request POST --header "Content-Type: application/json" --data '{ "id": "rack-1", "produced": 0.3, "currentHour": "2018-01-01T16:22:04.259Z" }' http://localhost:9000/api/racks
-curl -v --request POST --header "Content-Type: application/json" --data '{ "id": "rack-2", "produced": 0.3 }' http://localhost:9000/api/racks
-curl -v --request POST --header "Content-Type: application/json" --data '{ "id": "rack-2" }'http://localhost:9000/api/racks
+curl -v --request POST --header "Content-Type: application/json" --data '{ "rackId": "rack-1", "produced":0.2, "installedAt": "2018-01-06T15:10:48.515Z" }' http://localhost:9000/api/racks
+curl -v --request POST --header "Content-Type: application/json" --data '{ "rackId": "rack-1", "installedAt": "2018-01-06T15:10:48.515Z" }' http://localhost:9000/api/racks
+curl -v --request POST --header "Content-Type: application/json" --data '{ "rackId": "rack-1" }' http://localhost:9000/api/racks
 curl http://localhost:9000/api/all | jq .
 ```
 ```
