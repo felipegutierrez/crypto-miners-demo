@@ -74,10 +74,11 @@ class GpuController @Inject()(cc: ControllerComponents, rackRepository: RackRepo
             }
             Ok
           } catch {
-            case pe: ParseException => BadRequest(s"Could not parse the date: ${pe.getMessage}")
-            case re: RackException => BadRequest(s"Rack Exception: ${re.getMessage}")
-            case ge: GpuException => BadRequest(s"Gpu Exception: ${ge.getMessage}")
-            case e: Exception => BadRequest(s"Exception found: ${e.getMessage}")
+            case pe: ParseException => BadRequest(s"Could not parse the date: ${pe.getMessage}\n")
+            case re: RackException => BadRequest(s"Rack Exception: ${re.getMessage}\n")
+            case ge: GpuException => BadRequest(s"Gpu Exception: ${ge.getMessage}\n")
+            case nsee: NoSuchElementException => BadRequest(s"Element not found.\n")
+            case e: Exception => BadRequest(s"Exception found: ${e.getMessage}\n")
           }
         }
       )
