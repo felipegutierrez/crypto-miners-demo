@@ -11,8 +11,7 @@ import play.api.libs.json._
 import play.api.mvc._
 
 import scala.concurrent.Await
-import scala.concurrent.duration.{Duration, DurationInt}
-import scala.util.{Failure, Success, Try}
+import scala.concurrent.duration.DurationInt
 
 class GpuController @Inject()(cc: ControllerComponents, rackRepository: RackRepository, gpuRepository: GpuRepository)
   extends AbstractController(cc) with I18nSupport {
@@ -61,9 +60,7 @@ class GpuController @Inject()(cc: ControllerComponents, rackRepository: RackRepo
                 case e: Exception => throw GpuException(s"Error on select Gpu's from Rack: ${e.getMessage}")
               }
             } yield (futureRackRow, futureSeqGpuRow)
-
             val result = Await.result(futureResult, 20 seconds)
-
             result._1 match {
               case Some(rackRow) =>
                 // Insert Gpu in the Rack

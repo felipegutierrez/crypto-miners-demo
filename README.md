@@ -87,6 +87,11 @@ curl http://localhost:9000/api/all | jq .
   ]
 }
 ```
+If you try to add a Gpu to a non existing Rack you are going to receive a `HTTP/1.1 400 Bad Request` status.
+```
+curl -v --request POST --header "Content-Type: application/json" --data '{ "id": "rack-10000000-no-exist" }' http://localhost:9000/api/racks
+```
+
 
 ### Listing all racks:
 `curl http://localhost:9000/api/all | jq .`
