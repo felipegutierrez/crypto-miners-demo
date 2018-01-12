@@ -1,14 +1,23 @@
 package controllers
 
-import javax.inject._
-
+import bootstrap.SparkCommons
 import models.helper.Util
-import play.api.i18n.I18nSupport
+import org.apache.spark.sql.DataFrame
 import play.api.mvc._
+import play.api.i18n.I18nSupport
+import javax.inject._
 
 class SparkController @Inject()(cc: ControllerComponents) extends AbstractController(cc) with I18nSupport {
 
-  implicit lazy val ec = cc.executionContext
+  val rdd = SparkCommons.sparkSession.read.json("downloads/tweet-json")
+
+  def list = Action {
+    Ok(toJsonString(rdd))
+    // Ok("SparkController.list")
+  }
+
+  def toJsonString(rdd: DataFrame): String =
+    "[" + rdd.toJSON.collect.toList.mkString(",\n") + "]"
 
   def count() = Action { implicit request: Request[AnyContent] =>
 
@@ -17,10 +26,6 @@ class SparkController @Inject()(cc: ControllerComponents) extends AbstractContro
 
     Util.downloadSourceFile(fileToDownload, urlToDownload)
     Util.unzip(fileToDownload)
-
-    // val sparkContext = new SparkContext("local[*]", "SparkController")
-
-    // val lines = sparkContext.textFile("")
 
     println("Spark count application")
     Ok("Spark count application")
