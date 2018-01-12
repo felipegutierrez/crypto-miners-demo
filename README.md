@@ -198,6 +198,11 @@ If you try to pass a wrong String representation of time you are going to receiv
 ]
 ```
 
+### Executing some processing with Spark lib
+
+`curl http://localhost:9000/api/count`
+
+
 ### Testing Controllers:
 To test the controllers execute `sbt test`.
 

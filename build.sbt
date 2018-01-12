@@ -19,3 +19,5 @@ libraryDependencies += "org.scalatestplus.play" %% "scalatestplus-play" % "3.1.0
 libraryDependencies += "com.typesafe.play" %% "play-slick" % "3.0.0"
 libraryDependencies += "com.typesafe.play" %% "play-slick-evolutions" % "3.0.0"
 libraryDependencies += "org.xerial" % "sqlite-jdbc" % "3.19.3"
+
+libraryDependencies += "org.apache.spark" % "spark-core_2.11" % "2.2.0"
