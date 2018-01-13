@@ -26,5 +26,3 @@ libraryDependencies += "org.apache.spark" %% "spark-core" % "2.2.0"
 libraryDependencies += "org.apache.spark" %% "spark-sql" % "2.2.0"
 
 dependencyOverrides += "com.fasterxml.jackson.core" % "jackson-databind" % "2.6.5"
-
-
