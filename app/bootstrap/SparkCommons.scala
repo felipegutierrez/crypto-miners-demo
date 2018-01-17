@@ -5,7 +5,7 @@ import org.apache.spark.sql.SparkSession
 object SparkCommons {
 
   lazy val sparkSession: SparkSession = SparkSession.builder
-    .master("local")
+    .master("local[*]")
     .appName("ApplicationController")
     .getOrCreate()
 }

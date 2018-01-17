@@ -10,8 +10,10 @@ GET     /api/all                    controllers.RackController.all
 GET     /api/racks                  controllers.RackController.getRacks(at: String)
 GET     /api/allGpu                 controllers.GpuController.allGpu
 POST    /api/racks                  controllers.GpuController.addGpu
-GET     /api/count                  controllers.SparkController.count
-GET     /api/list                   controllers.SparkController.list
+GET     /api/listAll                controllers.SparkRatingController.listAll
+GET     /api/count                  controllers.SparkRatingController.count
+GET     /api/rate                   controllers.SparkRatingController.rate
+
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)

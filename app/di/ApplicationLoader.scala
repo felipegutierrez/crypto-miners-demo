@@ -39,7 +39,7 @@ class ApplicationComponents(context: Context)
 
   lazy val gpuController = new controllers.GpuController(controllerComponents, rack, gpu)
 
-  lazy val sparkController = new controllers.SparkController(controllerComponents)
+  lazy val sparkController = new controllers.SparkRatingController(controllerComponents)
 
   lazy val router = new _root_.router.Routes(httpErrorHandler, repositoryController, rackController, gpuController, sparkController, assets)
 
