@@ -200,7 +200,9 @@ If you try to pass a wrong String representation of time you are going to receiv
 
 ### Executing some processing with Spark lib
 
-`curl http://localhost:9000/api/count`
+Listing all movies from a file: `curl http://localhost:9000/api/listAll`
+Counting how many movies there is listed in the file: `curl http://localhost:9000/api/count`
+Rating all the movies from two files: movies.csv and ratings.csv: `http://localhost:9000/api/rate`
 
 
 ### Testing Controllers:
