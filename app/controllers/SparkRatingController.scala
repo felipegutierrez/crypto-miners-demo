@@ -49,7 +49,6 @@ class SparkRatingController @Inject()(cc: ControllerComponents) extends Abstract
     movies.cache()
     movies.printSchema()
 
-
     println("ratings")
     ratings.createOrReplaceTempView("ratings")
     ratings.cache()
@@ -63,6 +62,26 @@ class SparkRatingController @Inject()(cc: ControllerComponents) extends Abstract
     println("results")
     results.printSchema()
 
+    Ok(toJsonString(results))
+  }
+
+  def listByGenre(genres: String) = Action { implicit request: Request[AnyContent] =>
+
+    val genreArray = genres.split(",")
+    val genreCriteria = genreArray.mkString("WHERE m.genres LIKE (\'%", "%\') OR m.genres LIKE (\'%", "%\') ")
+
+    Util.downloadSourceFile(fileToDownload, urlToDownload)
+    Util.unzip(fileToDownload)
+    
+    val results: DataFrame = SparkCommons.sparkSession.sqlContext
+      .sql("SELECT m.title, m.genres, m.movieId, SUM(r.rating) rating " +
+        "FROM movies m JOIN ratings r ON (m.movieId = r.movieId) " +
+        genreCriteria +
+        "GROUP BY m.title, m.genres, m.movieId " +
+        "ORDER BY rating desc, m.genres asc"
+      )
+    println("results")
+    results.printSchema()
     Ok(toJsonString(results))
   }
 
