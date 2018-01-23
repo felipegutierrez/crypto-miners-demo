@@ -11,7 +11,7 @@ import play.api.libs.json._
 import play.api.mvc._
 
 import scala.concurrent.Await
-import scala.concurrent.duration.DurationInt
+import scala.concurrent.duration.Duration
 
 class GpuController @Inject()(cc: ControllerComponents, rackRepository: RackRepository, gpuRepository: GpuRepository)
   extends AbstractController(cc) with I18nSupport {
@@ -37,7 +37,7 @@ class GpuController @Inject()(cc: ControllerComponents, rackRepository: RackRepo
                 case e: Exception => throw GpuException(s"Error on select Gpu's from Rack: ${e.getMessage}")
               }
             } yield (futureRackRow, futureSeqGpuRow)
-            val result = Await.result(futureResult, 20 seconds)
+            val result = Await.result(futureResult, Duration.Inf)
             result._1 match {
               case Some(rackRow) =>
                 // given time (should be after currentHour, which was set during setup)
@@ -70,14 +70,15 @@ class GpuController @Inject()(cc: ControllerComponents, rackRepository: RackRepo
       )
   }
 
-  def allGpu = Action {
+  def allGpu = Action.async {
     implicit request: Request[AnyContent] =>
       var gpuSeq: Seq[Gpu] = Seq.empty
       val futureList = gpuRepository.list()
-      val result = Await.result(futureList, 20 seconds)
-      result.foreach { gpuRow =>
-        gpuSeq = gpuSeq :+ Gpu(gpuRow.id, gpuRow.rackId, gpuRow.produced, Util.toDate(gpuRow.installedAt))
+      futureList.map { result =>
+        result.foreach { gpuRow =>
+          gpuSeq = gpuSeq :+ Gpu(gpuRow.id, gpuRow.rackId, gpuRow.produced, Util.toDate(gpuRow.installedAt))
+        }
+        Ok(Json.toJson(gpuSeq)).as(JSON)
       }
-      Ok(Json.toJson(gpuSeq)).as(JSON)
   }
 }

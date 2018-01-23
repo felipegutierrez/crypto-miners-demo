@@ -72,7 +72,7 @@ class SparkRatingController @Inject()(cc: ControllerComponents) extends Abstract
 
     Util.downloadSourceFile(fileToDownload, urlToDownload)
     Util.unzip(fileToDownload)
-    
+
     val results: DataFrame = SparkCommons.sparkSession.sqlContext
       .sql("SELECT m.title, m.genres, m.movieId, SUM(r.rating) rating " +
         "FROM movies m JOIN ratings r ON (m.movieId = r.movieId) " +

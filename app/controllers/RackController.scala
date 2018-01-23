@@ -1,6 +1,5 @@
 package controllers
 
-import java.text.ParseException
 import javax.inject._
 
 import models._
@@ -10,7 +9,7 @@ import play.api.i18n.I18nSupport
 import play.api.libs.json._
 import play.api.mvc._
 
-import scala.concurrent.duration.DurationInt
+import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
 
 class RackController @Inject()(cc: ControllerComponents, rackRepository: RackRepository, gpuRepository: GpuRepository)
@@ -18,26 +17,24 @@ class RackController @Inject()(cc: ControllerComponents, rackRepository: RackRep
 
   implicit lazy val ec = cc.executionContext
 
-  def all = Action { implicit request: Request[AnyContent] =>
+  def all = Action.async { implicit request: Request[AnyContent] =>
     val futureList = rackRepository.list()
     var rackSeq: Seq[Rack] = Seq.empty
-
-    val resultRack = Await.result(futureList, 20 seconds)
-    resultRack.foreach { r =>
-      var gpuSeq: Seq[Gpu] = Seq.empty
-      val gpuSeqFuture = gpuRepository.getByRack(r.id)
-      val listGpu = for {
-        listGpu <- gpuSeqFuture
-      } yield listGpu
-      val result = Await.result(listGpu, 20 seconds)
-      result.foreach { gpuRow =>
-        gpuSeq = gpuSeq :+ Gpu(gpuRow.id, gpuRow.rackId, gpuRow.produced, Util.toDate(gpuRow.installedAt))
+    futureList.map { resultRack =>
+      resultRack.foreach { r =>
+        var gpuSeq: Seq[Gpu] = Seq.empty
+        val gpuSeqFuture = gpuRepository.getByRack(r.id)
+        gpuSeqFuture.map { result =>
+          result.foreach { gpuRow =>
+            gpuSeq = gpuSeq :+ Gpu(gpuRow.id, gpuRow.rackId, gpuRow.produced, Util.toDate(gpuRow.installedAt))
+          }
+          val rack = Rack(r.id, r.produced, Util.toDate(r.currentHour), gpuSeq)
+          rackSeq = rackSeq :+ rack
+        }
       }
-      val rack = Rack(r.id, r.produced, Util.toDate(r.currentHour), gpuSeq)
-      rackSeq = rackSeq :+ rack
+      val setup: Setup = Setup(rackRepository.getProfitPerGpu, rackSeq)
+      Ok(Json.toJson(setup)).as(JSON)
     }
-    val setup: Setup = Setup(rackRepository.getProfitPerGpu, rackSeq)
-    Ok(Json.toJson(setup)).as(JSON)
   }
 
   def addRack = Action(parse.json) { request =>
@@ -46,12 +43,13 @@ class RackController @Inject()(cc: ControllerComponents, rackRepository: RackRep
       errors => BadRequest("invalid json Rack.\n"),
       rack => {
         val f: Future[Option[RackRow]] = rackRepository.getById(rack.id)
-        val result = Await.result(f, 20 seconds)
+        val result = Await.result(f, Duration.Inf)
         result match {
           case Some(r) =>
             // If the Rack already exists we update the produced and currentTime properties
             val fGpu: Future[Seq[GpuRow]] = gpuRepository.getByRack(r.id)
-            val resultGpu = Await.result(fGpu, 20 seconds)
+            // val total = fGpu.map(_.map(_.produced).sum)
+            val resultGpu = Await.result(fGpu, Duration.Inf)
             val total = resultGpu.map(_.produced).sum
             rackRepository.update(r.id, Some(total), Some(System.currentTimeMillis))
             Ok("Rack already exists! Updated produced and currentTime.\n")
@@ -65,13 +63,13 @@ class RackController @Inject()(cc: ControllerComponents, rackRepository: RackRep
     )
   }
 
-  def getRacks(at: String) = Action { implicit request: Request[AnyContent] =>
-    try {
-      val futureList = rackRepository.get(Util.toTime(at))
-      val resultRack = Await.result(futureList, 20 seconds)
-      var rackSeq: Seq[Rack] = Seq.empty
-      var gpuSeq: Seq[Gpu] = Seq.empty
+  def getRacks(at: String) = Action.async { implicit request: Request[AnyContent] =>
 
+    var rackSeq: Seq[Rack] = Seq.empty
+    var gpuSeq: Seq[Gpu] = Seq.empty
+    val futureList = rackRepository.get(Util.toTime(at))
+
+    futureList.map { resultRack =>
       if (resultRack.isEmpty) BadRequest(Json.toJson("Rack not found."))
       else {
         resultRack.foreach { r =>
@@ -79,7 +77,7 @@ class RackController @Inject()(cc: ControllerComponents, rackRepository: RackRep
           val listGpu = for {
             listGpu <- gpuSeqFuture
           } yield listGpu
-          val result = Await.result(listGpu, 20 seconds)
+          val result = Await.result(listGpu, Duration.Inf)
           result.foreach { gpuRow =>
             gpuSeq = gpuSeq :+ Gpu(gpuRow.id, gpuRow.rackId, gpuRow.produced, Util.toDate(gpuRow.installedAt))
           }
@@ -88,8 +86,10 @@ class RackController @Inject()(cc: ControllerComponents, rackRepository: RackRep
         }
         Ok(Json.toJson(rackSeq)).as(JSON)
       }
-    } catch {
-      case pe: ParseException => BadRequest(Json.toJson("Error on parse String to time."))
     }
+    //    try {
+    //    } catch {
+    //      case pe: ParseException => BadRequest(Json.toJson("Error on parse String to time."))
+    //    }
   }
 }
