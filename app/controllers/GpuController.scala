@@ -17,10 +17,6 @@ class GpuController @Inject()(cc: ControllerComponents, rackRepository: RackRepo
 
   implicit lazy val ec = cc.executionContext
 
-  def index() = Action { implicit request: Request[AnyContent] =>
-    Ok(views.html.index())
-  }
-
   def addGpu() = Action(parse.json).async { request =>
     val either = request.body.validate[Gpu]
     either.fold(

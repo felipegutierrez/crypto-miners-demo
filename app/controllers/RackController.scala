@@ -42,21 +42,22 @@ class RackController @Inject()(cc: ControllerComponents, rackRepository: RackRep
     either.fold(
       errors => Future.successful(BadRequest("invalid json Rack.\n")),
       rack => {
-        val f: Future[Option[RackRow]] = rackRepository.getById(rack.id)
-        f.map {
-          case Some(r) =>
+        rackRepository.getById(rack.id).flatMap {
+          case Some(rackRow) =>
             // If the Rack already exists we update the produced and currentTime properties
-            val fGpu: Future[Seq[GpuRow]] = gpuRepository.getByRack(r.id)
-            val total = fGpu.map(_.map(_.produced).sum)
-            total.map { total =>
-              rackRepository.update(r.id, Some(total), Some(System.currentTimeMillis))
+            gpuRepository.getByRack(rackRow.id).map { seqGpuRow: Seq[GpuRow] =>
+              val total: Float = seqGpuRow.map(_.produced).sum
+              rackRepository.update(rackRow.id, Some(total), Some(System.currentTimeMillis))
             }
-            Ok("Rack already exists! Updated produced and currentTime.\n")
+            Future.successful(Ok("Rack already exists! Updated produced and currentTime.\n"))
           case None =>
             // If the Rack does not exist we create it.
-            val rackRow = RackRow(rack.id, rack.produced, System.currentTimeMillis)
-            rackRepository.insert(rackRow)
-            Ok
+            rackRepository.insert(RackRow(rack.id, rack.produced, System.currentTimeMillis))
+            Future.successful(Ok("Rack inserted successfully.\n"))
+        }.recover {
+          case re: RackException => BadRequest(Json.toJson(re.message))
+          case e: Exception => BadRequest(Json.toJson("Error to get racks: " + e.getMessage))
+          case _ => BadRequest(Json.toJson("Unknown error to get racks."))
         }
       }
     )
