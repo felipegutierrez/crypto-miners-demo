@@ -18,22 +18,22 @@ class RackController @Inject()(cc: ControllerComponents, rackRepository: RackRep
   implicit lazy val ec = cc.executionContext
 
   def all = Action.async { implicit request: Request[AnyContent] =>
-    val futureList = rackRepository.list()
-    var rackSeq: Seq[Rack] = Seq.empty
-    futureList.map { resultRack =>
-      resultRack.foreach { r =>
-        var gpuSeq: Seq[Gpu] = Seq.empty
-        val gpuSeqFuture = gpuRepository.getByRack(r.id)
-        gpuSeqFuture.map { result =>
-          result.foreach { gpuRow =>
-            gpuSeq = gpuSeq :+ Gpu(gpuRow.id, gpuRow.rackId, gpuRow.produced, Util.toDate(gpuRow.installedAt))
-          }
-          val rack = Rack(r.id, r.produced, Util.toDate(r.currentHour), gpuSeq)
-          rackSeq = rackSeq :+ rack
+    rackRepository.list().flatMap {
+      seqRackRow: Seq[RackRow] =>
+        val futureSeqRackRow: Seq[Future[Rack]] = seqRackRow.map {
+          rackRow: RackRow =>
+            gpuRepository.getByRack(rackRow.id).map {
+              seqGpuRow: Seq[GpuRow] =>
+                val seqGpu = seqGpuRow.map(gpuRepository.gpuRowToGpu) // return Seq[Gpu]
+                Rack(rackRow.id, rackRow.produced, Util.toDate(rackRow.currentHour), seqGpu)
+            } // return Future[Rack]
         }
-      }
-      val setup: Setup = Setup(rackRepository.getProfitPerGpu, rackSeq)
-      Ok(Json.toJson(setup)).as(JSON)
+        val futureSeqRack: Future[Seq[Rack]] = Future.sequence(futureSeqRackRow)
+        futureSeqRack.map(racks => Ok(Json.toJson(Setup(rackRepository.getProfitPerGpu, racks))).as(JSON))
+    }.recover {
+      case re: RackException => BadRequest(Json.toJson(re.message))
+      case e: Exception => BadRequest(Json.toJson("Error to get racks: " + e.getMessage))
+      case _ => BadRequest(Json.toJson("Unknown error to get racks."))
     }
   }
 
