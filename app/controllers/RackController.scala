@@ -63,22 +63,29 @@ class RackController @Inject()(cc: ControllerComponents, rackRepository: RackRep
   }
 
   def getRacks(at: String) = Action.async { implicit request: Request[AnyContent] =>
-    rackRepository.get(Util.toTime(at)).flatMap {
-      seqRackRow: Seq[RackRow] =>
-        val seqFutureRack: Seq[Future[Rack]] = seqRackRow.map {
-          rackRow: RackRow =>
-            gpuRepository.getByRack(rackRow.id).map {
-              seqGpuRow: Seq[GpuRow] =>
-                val seqGpu = seqGpuRow.map(gpuRepository.gpuRowToGpu) // return Seq[Gpu]
-                Rack(rackRow.id, rackRow.produced, Util.toDate(rackRow.currentHour), seqGpu)
-            } // return Future[Rack]
-        }
-        val futureSeqRack: Future[Seq[Rack]] = Future.sequence(seqFutureRack)
-        futureSeqRack.map(racks => Ok(Json.toJson(racks)).as(JSON))
-    }.recover {
-      case pe: ParseException => BadRequest(Json.toJson("Error on parse String to time."))
-      case e: Exception => BadRequest(Json.toJson("Error to get racks."))
-      case _ => BadRequest(Json.toJson("Unknow error to get racks."))
+    try {
+      rackRepository.get(Util.toTime(at)).flatMap {
+        seqRackRow: Seq[RackRow] =>
+          if (seqRackRow.isEmpty) throw new RackException("There is no Rack with this time [" + at + "].")
+          val seqFutureRack: Seq[Future[Rack]] = seqRackRow.map {
+            rackRow: RackRow =>
+              gpuRepository.getByRack(rackRow.id).map {
+                seqGpuRow: Seq[GpuRow] =>
+                  val seqGpu = seqGpuRow.map(gpuRepository.gpuRowToGpu) // return Seq[Gpu]
+                  Rack(rackRow.id, rackRow.produced, Util.toDate(rackRow.currentHour), seqGpu)
+              } // return Future[Rack]
+          }
+          val futureSeqRack: Future[Seq[Rack]] = Future.sequence(seqFutureRack)
+          futureSeqRack.map(racks => Ok(Json.toJson(racks)).as(JSON))
+      }.recover {
+        case re: RackException => BadRequest(Json.toJson(re.message))
+        case e: Exception => BadRequest(Json.toJson("Error to get racks: " + e.getMessage))
+        case _ => BadRequest(Json.toJson("Unknown error to get racks."))
+      }
+    } catch {
+      case pe: ParseException => Future.successful(BadRequest(Json.toJson("Error on parsing String [" + at + "] to Time.")))
+      case e: Exception => Future.successful(BadRequest(Json.toJson("Error to get racks: " + e.getMessage)))
+      case _ => Future.successful(BadRequest(Json.toJson("Unknown error to get racks.")))
     }
   }
 }
