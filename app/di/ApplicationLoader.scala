@@ -2,9 +2,9 @@ package di
 
 import controllers.AssetsComponents
 import play.api.ApplicationLoader.Context
-import play.api.db.{DBComponents, HikariCPComponents}
 import play.api.db.evolutions.EvolutionsComponents
 import play.api.db.slick.{DatabaseConfigProvider, DbName, SlickApi, SlickComponents}
+import play.api.db.{DBComponents, HikariCPComponents}
 import play.api.{Application, BuiltInComponentsFromContext, LoggerConfigurator, ApplicationLoader => PlayApplicationLoader}
 import play.filters.HttpFiltersComponents
 import slick.basic.{BasicProfile, DatabaseConfig}
@@ -49,14 +49,11 @@ trait PersistenceComponents {
 
   implicit def executionContext: ExecutionContext
 
-  def slickApi: SlickApi
-
   lazy val defaultDbProvider = new DatabaseConfigProvider {
     def get[P <: BasicProfile]: DatabaseConfig[P] = slickApi.dbConfig[P](DbName("default"))
   }
-
   lazy val rack = new models.RackRepository(defaultDbProvider)
-
   lazy val gpu = new models.GpuRepository(defaultDbProvider)
-}
 
+  def slickApi: SlickApi
+}
