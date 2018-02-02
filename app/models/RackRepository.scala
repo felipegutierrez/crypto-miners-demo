@@ -30,6 +30,9 @@ class RackRepository @Inject()(protected val dbConfigProvider: DatabaseConfigPro
   def create(row: List[RackRow]): Future[Option[Int]] =
     db.run(RackTable ++= row)
 
+  def delete(rackId: String): Future[Unit] =
+    db.run(RackTable.filter(_.id === rackId).delete).map(_ => ())
+
   def insert(row: RackRow): Future[Unit] =
     db.run(RackTable += row).map(_ => ())
 

@@ -73,6 +73,12 @@ class GpuRepository @Inject()(protected val dbConfigProvider: DatabaseConfigProv
   def insert(row: GpuRow): Future[Unit] =
     db.run(GpuTable += row).map(_ => ())
 
+  def delete(gpuId: String): Future[Unit] =
+    db.run(GpuTable.filter(_.id === gpuId).delete).map(_ => ())
+
+  def deleteByRack(rackId: String): Future[Unit] =
+    db.run(GpuTable.filter(_.rackId === rackId).delete).map(_ => ())
+
   def getByRack(rackId: String): Future[Seq[GpuRow]] =
     db.run(GpuTable.filter(_.rackId === rackId).result)
 

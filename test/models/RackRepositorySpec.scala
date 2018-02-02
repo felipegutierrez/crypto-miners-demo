@@ -1,50 +1,34 @@
 package models
 
-import org.scalatestplus.play.PlaySpec
-import org.scalatestplus.play.guice.GuiceOneAppPerTest
-import play.api.db.evolutions._
-import play.api.db.{Database, Databases}
-import play.api.inject.bind
-import play.api.inject.guice.GuiceInjectorBuilder
-import play.api.test.Injecting
+import org.specs2.mutable.Specification
+import play.api.Application
+import play.api.test.WithApplicationLoader
 
-class RackRepositorySpec extends PlaySpec with GuiceOneAppPerTest with Injecting {
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.{Await, Future}
+import scala.concurrent.duration.DurationInt
 
-  val database = Databases(
-    driver = "org.sqlite.JDBC",
-    url = "jdbc:sqlite:development.db",
-    name = "default",
-    config = Map(
-      "username" -> "",
-      "password" -> ""
-    )
-  )
-  val guice = new GuiceInjectorBuilder()
-    .overrides(bind[Database].toInstance(database))
-    .injector()
-  // val defaultDbProvider = guice.instanceOf[DatabaseConfigProvider]
+class RackRepositorySpec extends Specification {
 
-  def beforeAll() = Evolutions.applyEvolutions(database)
+  "RackRepository" should {
+    "delete and insert Rack's" in new WithApplicationLoader {
+      val app2dao = Application.instanceCache[RackRepository]
+      val rackRepository: RackRepository = app2dao(app)
 
-  def afterAll() = {
-    // Evolutions.cleanupEvolutions(database)
-    database.shutdown()
+      Await.result(rackRepository.delete("r-1"), 3 seconds)
+      Await.result(rackRepository.delete("r-2"), 3 seconds)
+      Await.result(rackRepository.delete("r-3"), 3 seconds)
+
+      val testRacks = Set(
+        RackRow("r-1", 0.2F, System.currentTimeMillis()),
+        RackRow("r-2", 0.5F, System.currentTimeMillis()),
+        RackRow("r-3", 0.8F, System.currentTimeMillis())
+      )
+
+      Await.result(Future.sequence(testRacks.map(rackRepository.insert)), 3 seconds)
+      val storedRacks = Await.result(rackRepository.list(), 3 seconds)
+
+      storedRacks.toSet must contain(testRacks)
+    }
   }
-
-  Evolution(
-    1,
-    "create table test (id bigint not null, name varchar(255));",
-    "drop table test;"
-  )
-
-  //  "RackController GET" should {
-  //    "render the rack page from a new instance of controller" in {
-  //      val controller = new RackController(stubControllerComponents(), rack, gpu)
-  //      val result = controller.all().apply(FakeRequest(GET, "/api/all"))
-  //
-  //      status(result) mustBe OK
-  //      contentType(result) mustBe Some("application/json")
-  //      contentAsString(result) must include("{ \"profitPerGpu\" }")
-  //    }
-  //  }
 }
