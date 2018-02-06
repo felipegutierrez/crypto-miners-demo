@@ -198,18 +198,18 @@ If you try to pass a wrong String representation of time you are going to receiv
 ]
 ```
 
-### Executing some processing with Spark lib
+### Executing some processing with Spark
 
 #### Using Spark SQL
 
-Listing all movies from a file: `curl http://localhost:9000/api/listAll`
-Counting how many movies there is listed in the file: `curl http://localhost:9000/api/count`
-Rating all the movies from two files: movies.csv and ratings.csv: `http://localhost:9000/api/rate`
-Listing all movies by genre: `http://localhost:9000/api/listByGenre?genres=Comedy,Romance`
+ - Listing all movies from a file: `curl http://localhost:9000/api/listAll`
+ - Counting how many movies there is listed in the file: `curl http://localhost:9000/api/count`
+ - Rating all the movies from two files: movies.csv and ratings.csv: `http://localhost:9000/api/rate`
+ - Listing all movies by genre: `http://localhost:9000/api/listByGenre?genres=Comedy,Romance`
 
 #### Using Spark context
 
-Listing popular movies (count, movieId): `http://localhost:9000/api/popularMovies`
+ - Listing popular movies (count, movieId): `http://localhost:9000/api/popularMovies`
 
 
 
