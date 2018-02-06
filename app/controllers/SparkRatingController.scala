@@ -32,6 +32,9 @@ class SparkRatingController @Inject()(cc: ControllerComponents) extends Abstract
     Ok(toJsonString(movies))
   }
 
+  def toJsonString(rdd: DataFrame): String =
+    "[" + rdd.toJSON.collect.toList.mkString(",\n") + "]"
+
   def count() = Action { implicit request: Request[AnyContent] =>
 
     Util.downloadSourceFile(fileToDownload, urlToDownload)
@@ -65,6 +68,25 @@ class SparkRatingController @Inject()(cc: ControllerComponents) extends Abstract
     Ok(toJsonString(results))
   }
 
+  def popularMovies() = Action { implicit request: Request[AnyContent] =>
+    Util.downloadSourceFile("downloads/ml-100k.zip", "http://files.grouplens.org/datasets/movielens/ml-100k.zip")
+    Util.unzip("downloads/ml-100k.zip")
+
+    val sparkContext = SparkCommons.sparkSession.sparkContext // got sparkContext
+
+    val popularMovies = sparkContext
+      .textFile("downloads/ml-100k/u.data") // popularMovies
+      .map(x => (x.split("\t")(1).toInt, 1)) // Map to (movieID , 1) tuples
+      .reduceByKey((x, y) => x + y) // Count up all the 1's for each movie
+      .map(x => (x._2, x._1)) // Flip (movieId, count) to (count, movieId)
+      .sortByKey(false) // Sort and invert the order to show the most popular movies first
+
+    // collect and print the result
+    val results = popularMovies.collect().toList.mkString(",\n")
+
+    Ok("[" + results + "]")
+  }
+
   def listByGenre(genres: String) = Action { implicit request: Request[AnyContent] =>
 
     val genreArray = genres.split(",")
@@ -84,7 +106,4 @@ class SparkRatingController @Inject()(cc: ControllerComponents) extends Abstract
     results.printSchema()
     Ok(toJsonString(results))
   }
-
-  def toJsonString(rdd: DataFrame): String =
-    "[" + rdd.toJSON.collect.toList.mkString(",\n") + "]"
 }

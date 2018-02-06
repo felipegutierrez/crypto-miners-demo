@@ -14,6 +14,7 @@ GET     /api/listAll                controllers.SparkRatingController.listAll
 GET     /api/count                  controllers.SparkRatingController.count
 GET     /api/rate                   controllers.SparkRatingController.rate
 GET     /api/listByGenre            controllers.SparkRatingController.listByGenre(genres: String)
+GET     /api/popularMovies          controllers.SparkRatingController.popularMovies
 
 
 # Map static resources from the /public folder to the /assets URL path

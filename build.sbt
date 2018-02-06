@@ -25,5 +25,6 @@ libraryDependencies += "org.xerial" % "sqlite-jdbc" % "3.19.3"
 
 libraryDependencies += "org.apache.spark" %% "spark-core" % "2.2.0"
 libraryDependencies += "org.apache.spark" %% "spark-sql" % "2.2.0"
+libraryDependencies += "org.apache.hadoop" % "hadoop-client" % "2.7.2"
 
 dependencyOverrides += "com.fasterxml.jackson.core" % "jackson-databind" % "2.6.5"
