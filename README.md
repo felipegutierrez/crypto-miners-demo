@@ -204,12 +204,13 @@ If you try to pass a wrong String representation of time you are going to receiv
 
  - Listing all movies from a file: `curl http://localhost:9000/api/listAll`
  - Counting how many movies there is listed in the file: `curl http://localhost:9000/api/count`
- - Rating all the movies from two files: movies.csv and ratings.csv: `http://localhost:9000/api/rate`
- - Listing all movies by genre: `http://localhost:9000/api/listByGenre?genres=Comedy,Romance`
+ - Rating all the movies from two files: movies.csv and ratings.csv: `curl http://localhost:9000/api/rate`
+ - Listing all movies by genre: `curl http://localhost:9000/api/listByGenre?genres=Comedy,Romance`
 
 #### Using Spark context
 
- - Listing popular movies (count, movieId): `http://localhost:9000/api/popularMovies`
+ - Listing popular movies (count, movieId): `curl http://localhost:9000/api/popularMovies`
+ - Showing the most popular superhero: `curl http://localhost:9000/api/mostPopularSuperHero`
 
 
 
