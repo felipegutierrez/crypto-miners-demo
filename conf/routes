@@ -19,7 +19,7 @@ GET     /api/popularMovies             controllers.SparkRatingController.popular
 
 GET     /api/mostPopularSuperHero      controllers.SparkMarvelController.mostPopularSuperHero
 GET     /api/mostPopularSuperHeroList  controllers.SparkMarvelController.mostPopularSuperHeroList(num: Int ?= 1, sort: Boolean ?= true)
-GET     /api/degreesOfSeparation       controllers.SparkMarvelController.degreesOfSeparation
+GET     /api/degreesOfSeparation       controllers.SparkMarvelController.degreesOfSeparation(startID: Int ?= 84, targetID: Int ?= 14)
 
 
 # Map static resources from the /public folder to the /assets URL path

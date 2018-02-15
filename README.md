@@ -217,7 +217,11 @@ http://localhost:9000/api/mostPopularSuperHeroList
 http://localhost:9000/api/mostPopularSuperHeroList?num=10
 http://localhost:9000/api/mostPopularSuperHeroList?num=10&sort=false
 ```
- - Degrees of separation: `http://localhost:9000/api/degreesOfSeparation`
+ - Degrees of separation:
+```
+http://localhost:9000/api/degreesOfSeparation
+http://localhost:9000/api/degreesOfSeparation?startID84&targetID=13
+```
 
 
 

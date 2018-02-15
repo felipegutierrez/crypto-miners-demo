@@ -67,14 +67,4 @@ object MarvelRepository {
 
     return s"The most [$num] populars superhero are \n[$mostPopularHeroName]\n with [ID, co-appearances] = \n[${mostPopularHeroTuple}]."
   }
-
-  def degreesOfSeparation(): String = {
-
-    // the characters we want to find the separation between
-    val startCharacterID = 5306 // Spiderman
-    val targetCharacterID = 14 // ADAM 3, 031 (who?)
-
-    return "degreesOfSeparation"
-  }
-
 }

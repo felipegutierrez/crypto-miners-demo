@@ -2,13 +2,14 @@ package controllers
 
 import javax.inject.Inject
 
-import models.MarvelRepository
+import models.{DegreesOfSeparation, MarvelRepository}
 import play.api.i18n.I18nSupport
 import play.api.mvc.{AbstractController, AnyContent, ControllerComponents, Request}
 
 class SparkMarvelController @Inject()(cc: ControllerComponents) extends AbstractController(cc) with I18nSupport {
 
   lazy val marvelRepository = MarvelRepository
+  lazy val dos = DegreesOfSeparation
 
   def mostPopularSuperHero() = Action { implicit request: Request[AnyContent] =>
     Ok(marvelRepository.getMostPopularSuperHero())
@@ -18,7 +19,7 @@ class SparkMarvelController @Inject()(cc: ControllerComponents) extends Abstract
     Ok(marvelRepository.getMostPopularSuperHero(num, sort))
   }
 
-  def degreesOfSeparation() = Action { implicit request: Request[AnyContent] =>
-    Ok(marvelRepository.degreesOfSeparation())
+  def degreesOfSeparation(startID: Int, targetID: Int) = Action { implicit request: Request[AnyContent] =>
+    Ok(dos.getDegreesOfSeparation(startID, targetID))
   }
 }

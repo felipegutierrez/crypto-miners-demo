@@ -7,5 +7,6 @@ object SparkCommons {
   lazy val sparkSession: SparkSession = SparkSession.builder
     .master("local[*]")
     .appName("ApplicationController")
+    .config("spark.driver.allowMultipleContexts", true)
     .getOrCreate()
 }
