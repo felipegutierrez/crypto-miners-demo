@@ -13,4 +13,12 @@ class SparkMarvelController @Inject()(cc: ControllerComponents) extends Abstract
   def mostPopularSuperHero() = Action { implicit request: Request[AnyContent] =>
     Ok(marvelRepository.getMostPopularSuperHero())
   }
+
+  def mostPopularSuperHeroList(num: Int, sort: Boolean) = Action { implicit request: Request[AnyContent] =>
+    Ok(marvelRepository.getMostPopularSuperHero(num, sort))
+  }
+
+  def degreesOfSeparation() = Action { implicit request: Request[AnyContent] =>
+    Ok(marvelRepository.degreesOfSeparation())
+  }
 }

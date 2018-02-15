@@ -211,6 +211,13 @@ If you try to pass a wrong String representation of time you are going to receiv
 
  - Listing popular movies (count, movieId): `curl http://localhost:9000/api/popularMovies`
  - Showing the most popular superhero: `curl http://localhost:9000/api/mostPopularSuperHero`
+ - Showing the list of most popular superhero:
+```
+http://localhost:9000/api/mostPopularSuperHeroList
+http://localhost:9000/api/mostPopularSuperHeroList?num=10
+http://localhost:9000/api/mostPopularSuperHeroList?num=10&sort=false
+```
+ - Degrees of separation: `http://localhost:9000/api/degreesOfSeparation`
 
 
 

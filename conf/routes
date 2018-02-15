@@ -4,21 +4,23 @@
 # ~~~~
 
 # An example controller showing a sample home page
-GET     /                           controllers.HomeController.index
-POST    /api/setup                  controllers.RackController.addRack
-GET     /api/all                    controllers.RackController.all
-GET     /api/racks                  controllers.RackController.getRacks(at: String)
-GET     /api/allGpu                 controllers.GpuController.allGpu
-POST    /api/racks                  controllers.GpuController.addGpu
+GET     /                              controllers.HomeController.index
+POST    /api/setup                     controllers.RackController.addRack
+GET     /api/all                       controllers.RackController.all
+GET     /api/racks                     controllers.RackController.getRacks(at: String)
+GET     /api/allGpu                    controllers.GpuController.allGpu
+POST    /api/racks                     controllers.GpuController.addGpu
 
-GET     /api/listAll                controllers.SparkRatingController.listAll
-GET     /api/count                  controllers.SparkRatingController.count
-GET     /api/rate                   controllers.SparkRatingController.rate
-GET     /api/listByGenre            controllers.SparkRatingController.listByGenre(genres: String)
-GET     /api/popularMovies          controllers.SparkRatingController.popularMovies
+GET     /api/listAll                   controllers.SparkRatingController.listAll
+GET     /api/count                     controllers.SparkRatingController.count
+GET     /api/rate                      controllers.SparkRatingController.rate
+GET     /api/listByGenre               controllers.SparkRatingController.listByGenre(genres: String)
+GET     /api/popularMovies             controllers.SparkRatingController.popularMovies
 
-GET     /api/mostPopularSuperHero   controllers.SparkMarvelController.mostPopularSuperHero
+GET     /api/mostPopularSuperHero      controllers.SparkMarvelController.mostPopularSuperHero
+GET     /api/mostPopularSuperHeroList  controllers.SparkMarvelController.mostPopularSuperHeroList(num: Int ?= 1, sort: Boolean ?= true)
+GET     /api/degreesOfSeparation       controllers.SparkMarvelController.degreesOfSeparation
 
 
 # Map static resources from the /public folder to the /assets URL path
-GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)
+GET     /assets/*file                  controllers.Assets.versioned(path="/public", file: Asset)
