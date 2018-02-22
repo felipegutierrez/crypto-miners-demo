@@ -61,7 +61,8 @@ object DegreesOfSeparation {
 
       // note that mapped.count action here forces the RDD to evaluate and that is the only reason
       // that our accumulator is actually updated.
-      result += "Processing " + mapped.count + " values.\n"
+      result += "The superhero [" + startCharacterID + " - " + startCharacterName + "] coappears with " +
+        mapped.count + " other superheroes characters.\n"
 
       if (hitCounter.isDefined) {
         val hitCount = hitCounter.get.value
